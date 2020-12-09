@@ -68,7 +68,48 @@ module Braintree
       body: query.to_gql
     )
   end
+
+  class GQL
+    getter io
+
+    def initialize
+      @io = String::Builder.new
+    end
+
+    macro method_missing(call)
+      {% if call.block %}
+        io << " {{call.name}}"
+        {% if call.args %}
+          io << {{ call.args }}.map{ |a| "(#{a}: $#{a})" }.join(", ")
+        {% end %}
+        io << " { "
+        io << {{call.block.body}}
+        io << " }"
+      {% else %}
+        io << " {{call.name}} "
+      {% end %}
+      nil
+    end
+
+    def self.query
+      gql = new
+      gql.io << "query { "
+      yield gql
+      gql.io << " }"
+      gql.io.to_s
+    end
+  end
 end
+
+puts(
+  Braintree::GQL.query do |gql|
+    gql.transactions("input") do
+      gql.yolo
+    end
+  end
+)
+
+exit 0
 
 Braintree.configure do |settings|
   settings.api_token = ENV.fetch("BRAINTREE_AUTH")
