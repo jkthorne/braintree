@@ -74,7 +74,7 @@ Braintree.configure do |settings|
   settings.api_token = ENV.fetch("BRAINTREE_AUTH")
 end
 
-Braintree.charge("fake-valid-nonce", "123.45") do |operation, transaction|
+Braintree.charge("fake-valid-nonce", "123.45", [:id, :status]) do |operation, transaction|
   if transaction
     puts transaction.id
     puts transaction.status
@@ -83,13 +83,18 @@ Braintree.charge("fake-valid-nonce", "123.45") do |operation, transaction|
   end
 end
 
-# Braintree.transaction_search(
-#   page_info: true,
-#   input_amount_value: {"greaterThanOrEqualTo" => "10.00"},
-#   input_status: ["SETTLED", "VOIDED"]) do |operation, transactions|
-#   if transactions # the operation was successful
-#     puts transactions
-#   else
-#     puts "ERROR #{operation}"
-#   end
-# end
+Braintree.transaction_search(
+  page_info: true,
+  amount: {"greaterThanOrEqualTo" => "10.00"},
+  status: [:SETTLED, :VOIDED],
+  transaction_fields: [:id, :status, :amount]
+  ) do |operation, transactions|
+  if transactions # the operation was successful
+    transactions.each do |txn|
+      puts txn.id
+      puts txn.status
+    end
+  else
+    puts "ERROR #{operation}"
+  end
+end

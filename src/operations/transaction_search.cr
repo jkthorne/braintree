@@ -1,13 +1,11 @@
 module Braintree::Operations
   class TransactionSearch < Query
+    getter amount : Hash(String, String)?
+    getter status : Array(Symbol)?
     getter page_info = false
-    getter id = true
-    getter status = true
-    getter amount = true
-    getter input_amount_value : Hash(String, String)?
-    getter input_status : Array(String)?
+    getter transaction_fields : Array(Symbol)
 
-    def initialize(@page_info = false, @id = true, @status = true, @amount = true, @input_amount_value = nil, @input_status = nil)
+    def initialize(@transaction_fields, @amount = nil, @status = nil, @page_info = false)
     end
 
     def to_gql
@@ -25,53 +23,31 @@ module Braintree::Operations
 
     private def query_string
       String.build do |io|
-        io << %(
-          query Search($input: TransactionSearchInput!) {
-            search {
-              transactions(input: $input) {
-        )
-        if page_info
-          io << %(
-            pageInfo {
-              hasNextPage
-              startCursor
-              endCursor
-            },
-          )
+        io << "query Search($input: TransactionSearchInput!) {"
+        io << "search { transactions(input: $input) {"
+        io << "pageInfo { hasNextPage startCursor endCursor }," if page_info
+        io << "edges { node { "
+        transaction_fields.each do |field|
+          if field == :amount
+            io << "amount { value currencyIsoCode } "
+            next
+          end
+          io << field
+          io << ' '
         end
-        io << %(
-          edges {
-            node {
-        )
-        io << "\nid\n" if id
-        io << "\nstatus\n" if status
-        if amount
-          io << %(
-            amount {
-              value
-              currencyIsoCode
-            }
-          )
-        end
-        io << %(
-                }
-              }
-            }
-          }
-        )
-        io << " }"
+        io << "} } } } }"
       end
     end
 
     def variables_builder(json)
       json.field "input" do
         json.object do
-          if !input_amount_value.nil?
+          if !amount.nil?
             json.field "amount" do
               json.object do
                 json.field "value" do
                   json.object do
-                    input_amount_value.not_nil!.each do |key, value|
+                    amount.not_nil!.each do |key, value|
                       json.field key, value
                     end
                   end
@@ -79,10 +55,10 @@ module Braintree::Operations
               end
             end
           end
-          if !input_status.nil?
+          if !status.nil?
             json.field "status" do
               json.object do
-                json.field "in", input_status
+                json.field "in", status
               end
             end
           end
