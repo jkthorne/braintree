@@ -28,9 +28,11 @@ module Braintree
     response = gql_request(query)
 
     if response.success?
-      gql_object = GQLResult.from_json(response.body)
+      gql_object = Models::TransactionResult.from_json(response.body)
       opertion = Operation.new(response, gql_object.data.search.transactions.page_info)
-      model = gql_object.data.search.transactions.edges
+      model = gql_object.data.search.transactions.edges.map do |edge|
+        edge.node
+      end
 
       yield opertion, model
     else
