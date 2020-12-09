@@ -1,4 +1,4 @@
-module Braintree
+module Braintree::Operations
   class Ping < Query
     def self.to_gql
       super do |io|

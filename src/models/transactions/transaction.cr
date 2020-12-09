@@ -5,15 +5,15 @@ class Braintree::Models::Transaction
     include JSON::Serializable
 
     @[JSON::Field(key: "value")]
-    property value : String
+    property value : String?
     @[JSON::Field(key: "currencyIsoCode")]
-    property currency_iso_code : String
+    property currency_iso_code : String?
   end
 
   @[JSON::Field(key: "id")]
-  property id : String
+  property id : String?
   @[JSON::Field(key: "status")]
-  property status : String
+  property status : String?
   @[JSON::Field(key: "amount")]
-  property amount : Amount
+  property amount : Amount?
 end

@@ -1,10 +1,6 @@
 module Braintree::Models
   class TransactionResult < GQLQueryResult
-    class Data::Search
-      include JSON::Serializable
-
-      @[JSON::Field(key: "transactions")]
-      property transactions : Models::Transactions
-    end
+    @[JSON::Field(key: "data")]
+    property data : TransactionData
   end
 end

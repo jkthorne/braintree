@@ -1,4 +1,4 @@
-module Braintree
+module Braintree::Operations
   class TransactionSearch < Query
     getter page_info = false
     getter id = true
@@ -43,8 +43,8 @@ module Braintree
           edges {
             node {
         )
-        io.puts "id" if id
-        io.puts "status\n" if status
+        io << "\nid\n" if id
+        io << "\nstatus\n" if status
         if amount
           io << %(
             amount {
