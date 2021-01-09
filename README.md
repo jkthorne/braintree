@@ -9,7 +9,7 @@ TODO: Write a description here
    ```yaml
    dependencies:
      braintree:
-       github: your-github-user/braintree
+       github: wontruefree/braintree
    ```
 
 2. Run `shards install`
