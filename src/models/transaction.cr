@@ -36,5 +36,29 @@ module Braintree
         yield op, tx
       end
     end
+
+    def self.create(*args, **kargs)
+      CreateTransaction.exec(*args, **kargs) do |op, tx|
+        if tx
+          pp tx
+        else
+          puts "Failed to create"
+        end
+      end
+    end
+
+    # Generates a valid set of params for a transaction
+    def self.factory_params(amount : String?, number : String?, expiration_date : Time?)
+      amount          ||= "#{rand(12..10_000)}.12"
+      number          ||= Braintree::Test::CreditCardNumbers::Disputes::CHARGEBACK
+      expiration_date ||= Time.utc.shift(months: rand(3..36))
+      {
+        amount: amount,
+        credit_card: {
+          number: number,
+          expiration_date: "%02d/%s" % [expiration_date.month, expiration_date.year],
+        }
+      }
+    end
   end
 end
