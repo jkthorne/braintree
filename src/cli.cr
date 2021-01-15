@@ -25,7 +25,7 @@ class Braintree::CLI
 
   def run
     command = Command::None
-    command_opts = {} of Symbol => String
+    opts = {} of Symbol => String
 
     OptionParser.parse do |parser|
       parser.banner = "Usage: bt [command] [switches] [--] [arguments]"
@@ -37,9 +37,9 @@ class Braintree::CLI
         parser.on("create", "Subcommand for disputes") do
           command = Command::DisputeCreate
           parser.banner = "Usage: bt disputes create [switches] [--] [arguments]"
-          parser.on("-a AMOUNT", "--ammount=AMOUNT", "set amount for dispute"){|_a| command_opts[:amount] = _a }
-          parser.on("-n NUM", "--number=NUM", "set card number for dispute"){|_n| command_opts[:number] = _n }
-          parser.on("-e EXP_DATE", "--exp_date=EXP_DATE", "set experation date for dispute"){|_e| command_opts[:expiration_date] = _e }
+          parser.on("-a AMOUNT", "--ammount=AMOUNT", "set amount for dispute"){|_a| opts[:amount] = _a }
+          parser.on("-n NUM", "--number=NUM", "set card number for dispute"){|_n| opts[:number] = _n }
+          parser.on("-e EXP_DATE", "--exp_date=EXP_DATE", "set experation date for dispute"){|_e| opts[:exp_date] = _e }
         end
       end
       parser.invalid_option do |flag|
@@ -57,13 +57,11 @@ class Braintree::CLI
     when Command::Dispute
       exit
     when Command::DisputeCreate
-      if command_opts[:expiration_date]?
-        expiration_month, expiration_year = command_opts[:expiration_date].split("/")
+      if opts[:exp_date]?
+        expiration_month, expiration_year = opts[:exp_date].split("/")
         expiration_date = Time.utc(year: expiration_year.to_i, month: expiration_month.to_i, day: 1)
       end
-      BT::Transaction.create(**BT::Transaction.factory_params(
-        command_opts[:amount]?, command_opts[:number]?, expiration_date
-      ))
+      BT::Transaction.create(**BT::Transaction.factory_params(opts[:amount]?, opts[:number]?, expiration_date))
     else
       STDERR.puts "ERROR: you found an error in the CLI please consider submitting an issue"
       exit 1
