@@ -34,15 +34,12 @@ class Braintree::CLI
       parser.on("dispute", "Subcommand for disputes") do
         command = Command::Dispute
         parser.banner = "Usage: bt disputes [command] [switches] [--] [arguments]"
-
         parser.on("create", "Subcommand for disputes") do
           command = Command::DisputeCreate
           parser.banner = "Usage: bt disputes create [switches] [--] [arguments]"
           parser.on("-a AMOUNT", "--ammount=AMOUNT", "set amount for dispute"){|_a| command_opts[:amount] = _a }
           parser.on("-n NUM", "--number=NUM", "set card number for dispute"){|_n| command_opts[:number] = _n }
           parser.on("-e EXP_DATE", "--exp_date=EXP_DATE", "set experation date for dispute"){|_e| command_opts[:expiration_date] = _e }
-          p command
-          pp command_opts
         end
       end
       parser.invalid_option do |flag|
