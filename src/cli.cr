@@ -39,7 +39,7 @@ class Braintree::CLI
           parser.banner = "Usage: bt disputes create [switches] [--] [arguments]"
           parser.on("-a AMOUNT", "--ammount=AMOUNT", "set amount for dispute"){|_a| opts[:amount] = _a }
           parser.on("-n NUM", "--number=NUM", "set card number for dispute"){|_n| opts[:number] = _n }
-          parser.on("-e EXP_DATE", "--exp_date=EXP_DATE", "set experation date for dispute"){|_e| opts[:exp_date] = _e }
+          parser.on("-e DATE", "--exp_date=DATE", "set experation date for dispute"){|_e| opts[:exp_date] = _e }
         end
       end
       parser.invalid_option do |flag|
