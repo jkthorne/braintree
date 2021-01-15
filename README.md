@@ -37,3 +37,18 @@ TODO: Write development instructions here
 ## Contributors
 
 - [your-name-here](https://github.com/your-github-user) - creator and maintainer
+
+
+
+# pp(
+#   GQL.client(
+#     uri: Braintree.graph_host,
+#     headers: {
+#       "Authorization" => Braintree.auth_token,
+#       "Braintree-Version" => "2019-01-01",
+#     },
+#     tls: false
+#   ).query { |q|
+#     q.ping
+#   }
+# )

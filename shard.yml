@@ -13,3 +13,5 @@ dependencies:
     github: luckyframework/habitat
   dotenv:
     github: gdotdesign/cr-dotenv
+  gql:
+    github: wontruefree/gql
