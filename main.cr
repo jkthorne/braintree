@@ -9,13 +9,15 @@ end
 date = Time.utc.shift years: 1
 expiration_date = "%02d/%s" % [date.month, date.year]
 
-BT::Transaction.create(
+params = {
   amount: "#{rand(12..10_000)}.12",
   credit_card: {
     number: Braintree::Test::CreditCardNumbers::Disputes::CHARGEBACK,
     expiration_date: expiration_date,
   }
-) do |operation, tx|
+}
+
+BT::Transaction.create(**params) do |operation, tx|
   if tx
     pp tx
   else
