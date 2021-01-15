@@ -15,7 +15,7 @@ class Braintree::CLI
   private getter color : Bool
 
   def initialize(@options)
-    setup ## TODO move to config module
+    setup_config
     @color = ENV["TERM"]? != "dumb"
   end
 
@@ -68,8 +68,7 @@ class Braintree::CLI
     end
   end
   
-  ## TODO: move to config module
-  def setup
+  def setup_config
     path = Path["~/.config/bt/config.ini"].expand(home: true)
 
     if File.exists?(path.to_s)

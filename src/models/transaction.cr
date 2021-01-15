@@ -40,7 +40,7 @@ module Braintree
     def self.create(*args, **kargs)
       CreateTransaction.exec(*args, **kargs) do |op, tx|
         if tx
-          pp tx
+          puts "Dispute Created with id #{tx.dig("transaction", "disputes", 0, "id")}"
         else
           puts "Failed to create"
         end
