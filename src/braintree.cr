@@ -10,6 +10,7 @@ require "./constants"
 require "./models"
 require "./operations"
 
+## TODO: remove for config file
 Dotenv.load ".env"
 
 module Braintree
