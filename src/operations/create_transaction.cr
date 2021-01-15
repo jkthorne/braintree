@@ -29,10 +29,7 @@ module Braintree
       )
 
       object = nil
-      if response.success?
-        object = JSON.parse(response.body)
-      end
-
+      object = JSON.parse(response.body) if response.success?
       yield response, object
     end
   end
