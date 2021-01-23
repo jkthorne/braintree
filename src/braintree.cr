@@ -7,8 +7,10 @@ require "dotenv"
 require "gql"
 
 require "./constants"
+require "./xml_builder"
 require "./models"
 require "./operations"
+require "./queries"
 
 ## TODO: remove for config file
 Dotenv.load ".env"
@@ -96,23 +98,24 @@ module Braintree
     )
   end
 
-  def self.http(path, body)
-    HTTP::Client.post(
-      host(path),
-      headers: HTTP::Headers{
-        "Authorization"     => "Bearer #{Braintree.auth_token}",
-        "x-apiversion"      => "6",
-        "User-Agent"        => "Totally Unoffical Crystal Client / 0.1",
-        "Accept"            => "application/json",
-        "Content-Type"      => "application/xml",
-        },
-      body: body
-    )
+  @@client : HTTP::Client?
+  def self.http
+    @@client ||= begin
+      client = HTTP::Client.new settings.host
+      client.before_request do |request|
+        request.headers["Authorization"] = "Bearer #{Braintree.auth_token}"
+        request.headers["x-apiversion"]  = "6"
+        request.headers["User-Agent"]    = "Totally Unoffical Crystal Client / 0.1"
+        request.headers["Accept"]        = "application/json"
+        request.headers["Content-Type"]  = "application/xml"
+      end
+      client
+    end
   end
 
-  def self.transaction_xml
+  def self.xml
     XML.build(version: "1.0", encoding: "UTF-8") do |xml|
-      Transaction::XMLBuilder.build(xml) do |tb|
+      XMLBuilder.build(xml) do |tb|
         yield tb
       end
     end

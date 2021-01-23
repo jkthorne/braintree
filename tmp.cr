@@ -1,24 +1,19 @@
-require "xml"
+require "csv"
 
-puts(
-XML.build(version: "1.0", encoding: "UTF-8") do |xml|
-  xml.element("transaction") do
-    xml.element("amount") { xml.text "10.40" }
-    xml.element("credit-card") do
-      xml.element("expiration-date") { xml.text "01/2022" }
-      xml.element("number") { xml.text "4023898493988028" }
+csv = CSV.new(File.read("./tmp.csv"), quote_char: '+')
+
+csv.each do |row|
+  puts(
+    "
+    # Generate an amount for a #{row[3]} declined transaction #{row[1]}
+    #
+    # #{row[2].strip}
+    # more info: https://developers.braintreepayments.com/reference/general/processor-responses/authorization-responses#code-#{row[0]}
+    def self.#{
+      row[1].strip.split(" ").map(&.capitalize).join.tr("'", "").underscore
+    }
+      rand(#{row[0]}.00..#{row[0]}.99)
     end
-    xml.element("type") { xml.text "sale" }
-  end
+    "
+  )
 end
-)
-
-# "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-# "<transaction>\n" +
-# "  <amount>10.40</amount>\n" +
-# "  <credit-card>\n" +
-# "    <expiration-date>01/2022</expiration-date>\n" +
-# "    <number>4023898493988028</number>\n" +
-# "  </credit-card>\n" +
-# "  <type>sale</type>\n" +
-# "</transaction>\n"
