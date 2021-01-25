@@ -1,8 +1,9 @@
 class Braintree::Operations::Dispute::Sandbox::LostDispute < BTO::Operation
   private getter amount : String
-  private getter credit_card : NamedTuple(number: String, expiration_date: String)
+  private getter card_number : String
+  private getter card_expiration : String
 
-  def initialize(@amount, @credit_card)
+  def initialize(@amount, @card_number, @card_expiration)
   end
 
   def self.exec(*args, **kargs)
@@ -12,9 +13,9 @@ class Braintree::Operations::Dispute::Sandbox::LostDispute < BTO::Operation
   end
 
   def exec
-    CreateTransaction.exec(@amount, @credit_card) do |op, tx|
+    CreateTransaction.exec(@amount, @card_number, @card_expiration) do |op, tx|
       if op.success? && tx
-        dispute_id = tx.dig("transaction", "disputes", 0, "id").as_s
+        dispute_id = tx.not_nil!.xpath_node("//transaction/disputes[1]/dispute/id").not_nil!.text
         AddTextEvidence.new(dispute_id, "losing_evidence").exec do |op, e|
           if op.success?
             Finalize.exec(dispute_id) do |op, d|

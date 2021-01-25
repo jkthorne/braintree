@@ -69,7 +69,7 @@ module Braintree
         ]
 
 
-        def self.valid_card
+        def self.valid
           ALL.sample
         end
 
@@ -115,6 +115,12 @@ module Braintree
 
         def self.country_type
           COUNTRY_TYPE.sample
+        end
+
+        # Expiration
+        def self.valid_expiration
+          expiration_date = Time.utc.shift(months: rand(3..36))
+          "%02d/%s" % [expiration_date.month, expiration_date.year]
         end
       end
     end

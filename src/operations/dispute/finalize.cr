@@ -8,16 +8,16 @@ class Braintree::Operations::Dispute::Finalize < BTO::Operation
     )
   end
 
-  # def self.exec(*args, **kargs)
-  #   new(*args, **kargs).exec do |op, tx|
-  #     yield op, tx
-  #   end
-  # end
+  def self.exec(*args, **kargs)
+    new(*args, **kargs).exec do |op, tx|
+      yield op, tx
+    end
+  end
 
   def exec
     response = Braintree.http.exec(@request.not_nil!) ## TODO: remove nil check
     @response = response
 
-    yield self, response.success? ? JSON.parse(response.body) : nil
+    yield self, response.success? ? XML.parse(response.body) : nil
   end
 end

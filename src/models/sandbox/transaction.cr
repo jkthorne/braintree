@@ -5,5 +5,13 @@ module Braintree
         Amount
       end
     end
+
+    def self.sandbox
+      Sandbox
+    end
+
+    def self.factory
+      TransactionFactory
+    end
   end
 end

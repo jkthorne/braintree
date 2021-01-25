@@ -1,9 +1,11 @@
 class Braintree::Operations::CreateTransaction < BTO::Operation
-  private getter amount : String
-  private getter credit_card : NamedTuple(number: String, expiration_date: String)
-  private getter type : String
+  getter amount : String
+  getter card_number : String
+  getter card_expiration : String
+  getter type : String
+  getter response : HTTP::Client::Response?
 
-  def initialize(@amount, @credit_card, @type = "sale")
+  def initialize(@amount, @card_number, @card_expiration, @type = "sale")
   end
 
   def self.exec(*args, **kargs)
@@ -19,14 +21,16 @@ class Braintree::Operations::CreateTransaction < BTO::Operation
         t.transaction {
           t.amount amount
           t.credit_card {
-            t.number credit_card[:number]
-            t.expiration_date credit_card[:expiration_date]
+            t.number card_number
+            t.expiration_date card_expiration
           }
           t.type type
         }
       }
     )
 
-    yield self, response.success? ? JSON.parse(response.body) : nil
+    @response = response # assign operation access later
+    ## TODO: deserialize to objects
+    yield self, response.success? ? XML.parse(response.body) : nil
   end
 end

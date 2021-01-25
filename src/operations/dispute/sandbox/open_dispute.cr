@@ -1,8 +1,9 @@
 class Braintree::Operations::Dispute::Sandbox::OpenDispute < BTO::Operation
   private getter amount : String
-  private getter credit_card : NamedTuple(number: String, expiration_date: String)
+  private getter card_number : String
+  private getter card_expiration : String
 
-  def initialize(@amount, @credit_card)
+  def initialize(@amount, @card_number, @card_expiration)
   end
 
   def self.exec(*args, **kargs)
@@ -12,7 +13,7 @@ class Braintree::Operations::Dispute::Sandbox::OpenDispute < BTO::Operation
   end
 
   def exec
-    CreateTransaction.exec(@amount, @credit_card) do |op, tx|
+    CreateTransaction.new(@amount, @card_number, @card_expiration).exec do |op, tx|
       yield op, tx
     end
   end

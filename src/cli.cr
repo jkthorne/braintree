@@ -36,10 +36,10 @@ class Braintree::CLI
         parser.on("create", "create a new dispute") do
           command = Command::DisputeCreate
           parser.banner = "Usage: bt disputes create [switches]"
-          parser.on("-a AMOUNT", "--ammount AMOUNT", "set amount for dispute"){|_a| opts[:amount] = _a }
+          parser.on("-a AMOUNT", "--amount AMOUNT", "set amount for dispute"){|_a| opts[:amount] = _a }
           parser.on("-n NUM", "--number NUM", "set card number for dispute"){|_n| opts[:number] = _n }
-          parser.on("-e DATE", "--exp_date DATE", "set experation date for dispute"){|_e| opts[:exp_date] = _e }
-          parser.on("-s STATUS", "--status STATUS", "set experation date for dispute (open,won,lost)"){|_s| opts[:status] = _s }
+          parser.on("-e DATE", "--exp_date DATE", "set expiration date for dispute"){|_e| opts[:exp_date] = _e }
+          parser.on("-s STATUS", "--status STATUS", "set expiration date for dispute (open,won,lost)"){|_s| opts[:status] = _s }
         end
         parser.on("find", "find a dispute") do
           command = Command::DisputeFind
@@ -65,21 +65,20 @@ class Braintree::CLI
         expiration_date = Time.utc(year: expiration_year.to_i, month: expiration_month.to_i, day: 1)
       end
 
-      case opts[:status]?
-      when "open", nil
-        dispute_klass = Braintree::Operations::Dispute::Sandbox::OpenDispute
-      when "won"
-        dispute_klass = Braintree::Operations::Dispute::Sandbox::WonDispute
-      # when "lost"
-      #   dispute_klass = Braintree::Operations::Dispute::Sandbox::LostDispute
+      dispute_klass = case opts[:status]? || "open"
+      when "open" then Braintree::Operations::Dispute::Sandbox::OpenDispute
+      when "won" then Braintree::Operations::Dispute::Sandbox::WonDispute
+      when "lost" then Braintree::Operations::Dispute::Sandbox::LostDispute
       else
         raise "the status #{opts[:status]} is not a valid status"
       end
-
-      args = BT::Transaction.factory_params(opts[:amount]?, opts[:number]?, expiration_date)
-      dispute_klass.new(**args).exec do |op, d|
+      dispute_klass.new(
+        amount: opts.fetch(:amount, BT::Transaction::Sandbox::Amount.authorized),
+        card_number: opts.fetch(:card_number, BT::Transaction::Sandbox::Dispute.card_number),
+        card_expiration: opts.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
+      ).exec do |op, d|
         if d
-          STDERR.puts "Dispute(#{d.dig("transaction", "disputes", 0, "id")}) Created with options #{opts}"
+          STDERR.puts "Dispute(#{d.xpath_node("//dispute/id").not_nil!.text}) Created with options #{opts}"
         else
           STDERR.puts "Failed to create dispute with options #{opts}"
           STDERR.puts "Server status #{op.try &.response.try &.status}" if op.try &.response.try &.status

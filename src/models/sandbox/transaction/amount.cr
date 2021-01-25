@@ -7,7 +7,7 @@ module Braintree
         # This transaction will also be settled
         # more info: https://developers.braintreepayments.com/reference/general/testing/ruby#amount-001-199999
         def self.authorized
-          rand(
+          "%.2f" % rand(
             [
               0.01..1999.99,
               3001.00..4000.99,

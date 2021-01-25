@@ -5,6 +5,7 @@ require "xml"
 require "habitat"
 require "dotenv"
 require "gql"
+require "factory"
 
 require "./constants"
 require "./xml_builder"
@@ -106,7 +107,7 @@ module Braintree
         request.headers["Authorization"] = "Bearer #{Braintree.auth_token}"
         request.headers["x-apiversion"]  = "6"
         request.headers["User-Agent"]    = "Totally Unoffical Crystal Client / 0.1"
-        request.headers["Accept"]        = "application/json"
+        # request.headers["Accept"]        = "application/json"
         request.headers["Content-Type"]  = "application/xml"
       end
       client

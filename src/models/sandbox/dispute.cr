@@ -9,7 +9,7 @@ module Braintree
         FRAUD_AMOUNT = StaticArray[VISA_FRAUD_1, VISA_FRAUD_2, VISA_FRAUD_3, DISCOVER_FRAUD]
 
         def self.card_number
-          4023898493988028
+          "4023898493988028"
         end
 
         def self.fraud_amount
