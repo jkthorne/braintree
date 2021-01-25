@@ -60,38 +60,9 @@ class Braintree::CLI
     when Command::Error
       exit 1
     when Command::DisputeCreate
-      if opts[:exp_date]?
-        expiration_month, expiration_year = opts[:exp_date].split("/")
-        expiration_date = Time.utc(year: expiration_year.to_i, month: expiration_month.to_i, day: 1)
-      end
-
-      dispute_klass = case opts.fetch(:status, "open")
-      when "open" then Braintree::Operations::Dispute::Sandbox::OpenDispute
-      when "won" then Braintree::Operations::Dispute::Sandbox::WonDispute
-      when "lost" then Braintree::Operations::Dispute::Sandbox::LostDispute
-      else
-        raise "the status #{opts[:status]} is not a valid status"
-      end
-      dispute_klass.new(
-        amount: opts.fetch(:amount, BT::Transaction::Sandbox::Amount.authorized),
-        card_number: opts.fetch(:card_number, BT::Transaction::Sandbox::Dispute.card_number),
-        card_expiration: opts.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
-      ).exec do |op, d|
-        if d
-          STDERR.puts "Dispute(#{d.xpath_node("//dispute/id").not_nil!.text}) Created with options #{opts}"
-        else
-          STDERR.puts "Failed to create dispute with options #{opts}"
-          STDERR.puts "Server status #{op.try &.response.try &.status}" if op.try &.response.try &.status
-        end
-      end
+      DisputeCreateCommand.exec(opts)
     when Command::DisputeFind
-      BTQ::Dispute::Find.exec(opts[:dispute_id]) do |op, d|
-        if d
-          puts "dispute found" ## TODO output more data
-        else
-          STDERR.puts "failed to find dispute"
-        end
-      end
+      DisputeFindCommand.exec(opts)
     else
       STDERR.puts "ERROR: you found an error in the CLI please consider submitting an issue"
       exit 1
@@ -122,3 +93,5 @@ class Braintree::CLI
     end
   end
 end
+
+require "./cli/**"
