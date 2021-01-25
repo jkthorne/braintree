@@ -65,7 +65,7 @@ class Braintree::CLI
         expiration_date = Time.utc(year: expiration_year.to_i, month: expiration_month.to_i, day: 1)
       end
 
-      dispute_klass = case opts[:status]? || "open"
+      dispute_klass = case opts.fetch(:status, "open")
       when "open" then Braintree::Operations::Dispute::Sandbox::OpenDispute
       when "won" then Braintree::Operations::Dispute::Sandbox::WonDispute
       when "lost" then Braintree::Operations::Dispute::Sandbox::LostDispute
