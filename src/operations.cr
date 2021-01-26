@@ -30,7 +30,7 @@ module Braintree::Operations
   end
 
   class Operation
-    getter request : HTTP::Request? ## TODO remove nil
+    getter request : HTTP::Request? # # TODO remove nil
     getter response : HTTP::Client::Response?
 
     def success?
@@ -51,7 +51,7 @@ module Braintree::Operations
   #     @state = State.new
   #     @state.operation = self
   #   end
-  
+
   #   def self.exec(*args, **kargs)
   #     new(*args, **kargs).exec do |op, tx|
   #       yield op, tx

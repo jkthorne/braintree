@@ -24,7 +24,6 @@ module Braintree::Operations
     def variables_builder(json)
       json.field "input" do
         json.object do
-
           json.field "paymentMethodId", payment_method
           json.field "transaction" do
             json.object do

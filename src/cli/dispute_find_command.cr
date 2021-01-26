@@ -7,7 +7,8 @@ class Braintree::CLI::DisputeFindCommand
 
     BTQ::Dispute::Find.exec(options[:dispute_id]) do |op, dispute|
       if dispute
-        puts "dispute found" ## TODO output more data
+        puts "dispute found" # # TODO output more data
+        exit
       else
         STDERR.puts "failed to find dispute"
         exit 1

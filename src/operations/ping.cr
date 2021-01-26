@@ -5,5 +5,5 @@ module Braintree::Operations
         io << "ping"
       end
     end
-  end  
+  end
 end

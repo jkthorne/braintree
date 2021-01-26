@@ -4,7 +4,7 @@ module Braintree
       module BankRoutingNumbers
         ROUNTING_NUMBER_1 = "071101307"
         ROUNTING_NUMBER_2 = "071000013"
-        ROUNTING_NUMBERS = StaticArray[ROUNTING_NUMBER_1, ROUNTING_NUMBER_2]
+        ROUNTING_NUMBERS  = StaticArray[ROUNTING_NUMBER_1, ROUNTING_NUMBER_2]
 
         # Bank routing numbers must pass a checksum, much like credit card numbers. The following routing numbers are valid, and can be passed to the sandbox:
         #

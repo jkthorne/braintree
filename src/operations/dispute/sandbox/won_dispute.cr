@@ -4,7 +4,7 @@ class Braintree::Operations::Dispute::Sandbox::WonDispute < BTO::Operation
   private getter card_expiration : String
 
   def initialize(@amount, @card_number, @card_expiration)
-    ## TODO: add state managment (State)
+    # # TODO: add state managment (State)
   end
 
   def self.exec(*args, **kargs)

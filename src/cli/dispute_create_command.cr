@@ -6,8 +6,9 @@ class Braintree::CLI::DisputeCreateCommand
       card_expiration: options.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
     ).exec do |op, dispute|
       if dispute
-        dispute.store unless options[:discard]? == "true"
+        dispute.store if options[:store]? == "true"
         STDERR.puts "Dispute(#{dispute.as(Dispute).id}) Created with options #{options}"
+        exit
       else
         STDERR.puts "Failed to create dispute with options #{options}"
         STDERR.puts "Server status #{op.try &.response.try &.status}" if op.try &.response.try &.status
@@ -24,7 +25,7 @@ class Braintree::CLI::DisputeCreateCommand
 
     case options.fetch(:status, "open")
     when "open" then resolve Braintree::Operations::Dispute::Sandbox::OpenDispute, options
-    when "won" then resolve Braintree::Operations::Dispute::Sandbox::WonDispute, options
+    when "won"  then resolve Braintree::Operations::Dispute::Sandbox::WonDispute, options
     when "lost" then resolve Braintree::Operations::Dispute::Sandbox::LostDispute, options
     else
       raise "the status #{options[:status]} is not a valid status"

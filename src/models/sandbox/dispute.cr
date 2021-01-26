@@ -2,11 +2,11 @@ module Braintree
   class Transaction
     module Sandbox
       module Dispute
-        VISA_FRAUD_1 = 83.00
-        VISA_FRAUD_2 = 10.40
-        VISA_FRAUD_3 = 13.10
+        VISA_FRAUD_1   = 83.00
+        VISA_FRAUD_2   = 10.40
+        VISA_FRAUD_3   = 13.10
         DISCOVER_FRAUD = 70.30
-        FRAUD_AMOUNT = StaticArray[VISA_FRAUD_1, VISA_FRAUD_2, VISA_FRAUD_3, DISCOVER_FRAUD]
+        FRAUD_AMOUNT   = StaticArray[VISA_FRAUD_1, VISA_FRAUD_2, VISA_FRAUD_3, DISCOVER_FRAUD]
 
         def self.card_number
           "4023898493988028"

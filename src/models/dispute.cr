@@ -1,8 +1,8 @@
 class Braintree::Dispute
   getter id : String
   getter global_id : String
-  getter amount : String ## TODO: money
-  getter amount_disputed : String ## TODO: money
+  getter amount : String          # # TODO: money
+  getter amount_disputed : String # # TODO: money
   getter amount_won : String
   getter case_number : String
   getter created_at : Time

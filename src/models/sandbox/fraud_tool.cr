@@ -24,6 +24,7 @@ module Braintree
         def self.gateway_rejected_kount
           "fake-gateway-rejected-kount-nonce"
         end
+
         # A nonce representing a card that will be gateway rejected by your risk threshold rules
         #
         # more info: https://developers.braintreepayments.com/reference/general/testing/ruby#fake-gateway-rejected-risk-thresholds-nonce

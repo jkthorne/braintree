@@ -6,7 +6,7 @@ module Braintree
         def self.does_not_match
           200
         end
-        
+
         # more info: https://developers.braintreepayments.com/reference/general/testing/ruby#cvv-201
         def self.not_verified
           201

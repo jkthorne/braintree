@@ -175,7 +175,7 @@ module Braintree
     def store
       File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
     end
-  
+
     def self.load(id)
       new(File.read(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s))
     end

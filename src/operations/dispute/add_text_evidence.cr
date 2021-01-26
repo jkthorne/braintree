@@ -12,7 +12,7 @@ class Braintree::Operations::Dispute::AddTextEvidence < BTO::Operation
   end
 
   def exec
-    ## TODO: move to @request
+    # # TODO: move to @request
     request = HTTP::Request.new(
       method: "POST",
       resource: "/merchants/#{BT.settings.merchant}/disputes/#{dispute_id}/evidence",

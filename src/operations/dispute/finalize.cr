@@ -15,7 +15,7 @@ class Braintree::Operations::Dispute::Finalize < BTO::Operation
   end
 
   def exec
-    response = Braintree.http.exec(@request.not_nil!) ## TODO: remove nil check
+    response = Braintree.http.exec(@request.not_nil!) # # TODO: remove nil check
     @response = response
 
     yield self, response.success? ? XML.parse(response.body) : nil

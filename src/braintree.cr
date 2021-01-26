@@ -14,7 +14,7 @@ require "./models"
 require "./operations"
 require "./queries"
 
-## TODO: remove for config file
+# # TODO: remove for config file
 Dotenv.load ".env"
 
 module Braintree
@@ -26,6 +26,7 @@ module Braintree
   end
 
   @@graph_host : URI?
+
   def self.graph_host
     @@graph_host ||= begin
       host = settings.host.dup
@@ -41,6 +42,7 @@ module Braintree
   end
 
   @@auth_token : String?
+
   def self.auth_token
     @@auth_toket ||= Base64.strict_encode(settings.public_key + ':' + settings.private_key)
   end
@@ -101,15 +103,16 @@ module Braintree
   end
 
   @@client : HTTP::Client?
+
   def self.http
     @@client ||= begin
       client = HTTP::Client.new settings.host
       client.before_request do |request|
         request.headers["Authorization"] = "Bearer #{Braintree.auth_token}"
-        request.headers["x-apiversion"]  = "6"
-        request.headers["User-Agent"]    = "Totally Unoffical Crystal Client / 0.1"
+        request.headers["x-apiversion"] = "6"
+        request.headers["User-Agent"] = "Totally Unoffical Crystal Client / 0.1"
         # request.headers["Accept"]        = "application/json"
-        request.headers["Content-Type"]  = "application/xml"
+        request.headers["Content-Type"] = "application/xml"
       end
       client
     end
