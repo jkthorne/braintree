@@ -11,6 +11,8 @@ class Braintree::CLI
     DisputeFind
   end
 
+  Log = ::Log.for("CLI")
+
   private getter options : Array(String)
   private getter color : Bool
 
@@ -40,11 +42,13 @@ class Braintree::CLI
           parser.on("-n NUM", "--number NUM", "set card number for dispute"){|_n| opts[:number] = _n }
           parser.on("-e DATE", "--exp_date DATE", "set expiration date for dispute"){|_e| opts[:exp_date] = _e }
           parser.on("-s STATUS", "--status STATUS", "set expiration date for dispute (open,won,lost)"){|_s| opts[:status] = _s }
+          parser.on("-d", "--discard", "does not persist the response"){|_s| opts[:discard] = "true" }
         end
         parser.on("find", "find a dispute") do
           command = Command::DisputeFind
           parser.banner = "Usage: bt disputes find [switches]"
           parser.on("-i ID", "--id=ID", "dispute id"){|_id| opts[:dispute_id] = _id }
+          parser.on("-l", "--local", "use local data"){|_id| opts[:local] = "true" }
         end
       end
       parser.invalid_option do |flag|

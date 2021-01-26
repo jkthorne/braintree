@@ -1,3 +1,4 @@
+require "log"
 require "http/client"
 require "json"
 require "xml"
@@ -122,9 +123,9 @@ module Braintree
     end
   end
 
-  def self.transaction(**kargs)
-    Transaction.new(**kargs)
-  end
+  # def self.transaction(**kargs)
+  #   Transaction.new(**kargs)
+  # end
 end
 
 alias BT = Braintree

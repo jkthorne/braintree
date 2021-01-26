@@ -15,22 +15,19 @@ class Braintree::Operations::Dispute::Sandbox::LostDispute < BTO::Operation
   def exec
     CreateTransaction.exec(@amount, @card_number, @card_expiration) do |op, tx|
       if op.success? && tx
-        dispute_id = tx.not_nil!.xpath_node("//transaction/disputes[1]/dispute/id").not_nil!.text
+        dispute = tx.disputes.first
+        dispute_id = dispute.id
         AddTextEvidence.new(dispute_id, "losing_evidence").exec do |op, e|
           if op.success?
             Finalize.exec(dispute_id) do |op, d|
-              if op.success? && d
-                yield op, d
-              else
-                yield op, d
-              end
+              yield op, dispute
             end
           else
-            yield op, e
+            yield op, dispute
           end
         end
       else
-        yield op, tx
+        yield op, nil
       end
     end
   end

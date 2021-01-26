@@ -4,9 +4,10 @@ class Braintree::CLI::DisputeCreateCommand
       amount: options.fetch(:amount, BT::Transaction::Sandbox::Amount.authorized),
       card_number: options.fetch(:card_number, BT::Transaction::Sandbox::Dispute.card_number),
       card_expiration: options.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
-    ).exec do |op, d|
-      if d
-        STDERR.puts "Dispute(#{d.xpath_node("//dispute/id").not_nil!.text}) Created with options #{options}"
+    ).exec do |op, dispute|
+      if dispute
+        dispute.store unless options[:discard]? == "true"
+        STDERR.puts "Dispute(#{dispute.as(Dispute).id}) Created with options #{options}"
       else
         STDERR.puts "Failed to create dispute with options #{options}"
         STDERR.puts "Server status #{op.try &.response.try &.status}" if op.try &.response.try &.status
