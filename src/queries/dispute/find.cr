@@ -9,6 +9,6 @@ class Braintree::Queries::Dispute::Find < BTQ::Query
       path: "/merchants/#{BT.settings.merchant}/disputes/#{id}"
     )
 
-    yield response, response.success? ? XML.parse(response.body) : nil
+    yield response, response.success? ? Braintree::Dispute.new(XML.parse(response.body)) : nil
   end
 end

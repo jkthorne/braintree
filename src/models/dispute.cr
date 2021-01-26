@@ -63,6 +63,7 @@ class Braintree::Dispute
   end
 
   def self.load(id)
-    new(File.read(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s))
+    path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
+    new(XML.parse(File.read(path))) if File.exists?(path)
   end
 end

@@ -40,9 +40,16 @@ class Braintree::CLI
       parser.on("-d", "--debug", "Print version") { ::Log.setup(:debug) }
       parser.on("dispute", "Subcommand for disputes") do
         parser.banner = "Usage: bt disputes [subcommand] [switches]"
-        parser.on("accept", "accepts a dispute") do
-          command = Command::DisputeAccept
+
+        parser.on("-l", "--local", "use local data") { |_i| opts[:local] = "true" }
+        parser.on("-F", "--finalize", "finalizes the dispute") { |_i| command = Command::DisputeFinalize }
+        parser.on("-A", "--accept", "accepts a dispute") { command = Command::DisputeAccept }
+
+        parser.on("-i ID", "--id ID", "dispute id") do |_i|
+          command = Command::DisputeFind if command == Command::None
+          opts[:dispute_id] = _i
         end
+
         parser.on("create", "create a new dispute") do
           command = Command::DisputeCreate
           parser.banner = "Usage: bt disputes create [switches]"
@@ -52,21 +59,14 @@ class Braintree::CLI
           parser.on("-s STATUS", "--status STATUS", "set expiration date for dispute (open,won,lost)") { |_s| opts[:status] = _s }
           parser.on("-s", "--store", "persist the response") { |_s| opts[:store] = "true" }
         end
+
         parser.on("evidence", "adds file evidence") do
           command = Command::DisputeEvidence
           parser.on("-t", "--text TEXT", "adds text evidenxe") { |_t| opts[:text] = _t }
           parser.on("-f", "--file PATH", "path to file") { |_f| opts[:file] = _f }
           parser.on("-r", "--remove", "removes evidence for dispute") { |_r| opts[:remove] = _r }
         end
-        parser.on("finalize", "finalizes a dispute") do
-          command = Command::DisputeFinalize
-        end
-        parser.on("find", "find a dispute") do
-          command = Command::DisputeFind
-          parser.banner = "Usage: bt disputes find [switches]"
-          parser.on("-i ID", "--id ID", "dispute id") { |_i| opts[:dispute_id] = _i }
-          parser.on("-l", "--local", "use local data") { |_i| opts[:local] = "true" }
-        end
+
         parser.on("search", "searches disputes") do
           command = Command::DisputeSearch
           parser.on("-a AMOUNT", "--amount AMOUNT", "amount range (100,200)") { |_a| opts[:amount] = _a }
