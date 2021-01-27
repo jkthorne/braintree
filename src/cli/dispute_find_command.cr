@@ -1,17 +1,19 @@
 class Braintree::CLI::DisputeFindCommand
-  def self.exec(options : Hash(Symbol, String))
-    if options[:local]? == "true"
-      dispute = Dispute.load(options[:dispute_id])
-      render dispute if dispute
-      exit
-    end
+  def self.exec(ids : Array(String), options : Hash(Symbol, String))
+    ids.each do |dispute_id|
+      if options[:source]? == "local"
+        dispute = Dispute.load(dispute_id)
+        render dispute if dispute
+        exit
+      end
 
-    BTQ::Dispute::Find.exec(options[:dispute_id]) do |op, dispute|
-      if dispute
-        render dispute
-      else
-        STDERR.puts "failed to find dispute"
-        exit 1
+      BTQ::Dispute::Find.exec(dispute_id) do |op, dispute|
+        if dispute
+          render dispute
+        else
+          STDERR.puts "failed to find dispute"
+          exit 1
+        end
       end
     end
   end

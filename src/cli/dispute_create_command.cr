@@ -6,7 +6,7 @@ class Braintree::CLI::DisputeCreateCommand
       card_expiration: options.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
     ).exec do |op, dispute|
       if dispute
-        dispute.store if options[:store]? == "true"
+        dispute.store if options[:source]? == "remote"
         STDERR.puts "Dispute(#{dispute.as(Dispute).id}) Created with options #{options}"
         exit
       else
