@@ -33,13 +33,14 @@ class Braintree::CLI
   def run
     ids = [] of String
     opts = {} of Symbol => String
+    banner = nil
 
     command = Command::Banner
     main_parser = OptionParser.parse do |parser|
       parser.banner = "Usage: bt [command] [switches]"
       parser.on("-h", "--help", "Show this help") {
         command = Command::Banner
-        opts[:banner] = parser.to_s
+        banner = parser.to_s
       }
       parser.on("-v", "--version", "Print version") { puts parser }
       parser.on("-d", "--debug", "Print version") { ::Log.setup(:debug) }
@@ -47,7 +48,7 @@ class Braintree::CLI
         parser.banner = "Usage: bt disputes [subcommand|ids] [switches]"
         parser.on("-h", "--help", "Show this help") {
           command = Command::Banner
-          opts[:banner] = parser.to_s
+          banner = parser.to_s
         }
         parser.separator("Global Values")
         parser.on("-l", "--local", "use local data") { opts[:source] = "local" }
@@ -61,7 +62,7 @@ class Braintree::CLI
           parser.banner = "Usage: bt disputes create [switches]"
           parser.on("-h", "--help", "Show this help") {
             command = Command::Banner
-            opts[:banner] = parser.to_s
+            banner = parser.to_s
           }
           parser.separator("Dispute Attributes")
           parser.on("-a AMOUNT", "--amount AMOUNT", "set amount for dispute") { |_a| opts[:amount] = _a }
@@ -72,9 +73,9 @@ class Braintree::CLI
 
         parser.on("evidence", "adds file evidence") do
           command = Command::DisputeEvidence
-          parser.on("-h", "--help", "Show this help")  {
+          parser.on("-h", "--help", "Show this help") {
             command = Command::Banner
-            opts[:banner] = parser.to_s
+            banner = parser.to_s
           }
           parser.separator("Types")
           parser.on("-t", "--text TEXT", "adds text evidenxe") { |_t| opts[:text] = _t }
@@ -84,9 +85,9 @@ class Braintree::CLI
 
         parser.on("search", "searches disputes") do
           command = Command::DisputeSearch
-          parser.on("-h", "--help", "Show this help")  {
+          parser.on("-h", "--help", "Show this help") {
             command = Command::Banner
-            opts[:banner] = parser.to_s
+            banner = parser.to_s
           }
           parser.separator("Search Criteria")
           parser.on("-a AMOUNT", "--amount AMOUNT", "amount range (100,200)") { |_a| opts[:amount] = _a }
@@ -111,8 +112,12 @@ class Braintree::CLI
         end
 
         parser.unknown_args do |pre_dash, post_dash|
-          command = Command::DisputeFind
-          ids = pre_dash
+          Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }
+          if !pre_dash.empty? || !post_dash.empty?
+            # TODO: maybe move to top of dispute parser
+            command = Command::DisputeFind
+            ids = pre_dash
+          end
         end
       end
 
@@ -122,23 +127,23 @@ class Braintree::CLI
         STDERR.puts parser
       end
     end
-    opts[:banner] ||= main_parser.to_s
+    banner ||= main_parser.to_s
 
     Log.debug { "command selected: #{command}" }
     case command
     when Command::Banner
-      STDERR.puts opts[:banner]
+      STDERR.puts banner
       exit
     when Command::Error
       exit 1
     when Command::DisputeAccept
-      # TODO
+      DisputeAcceptCommand.exec(ids)
     when Command::DisputeEvidence
       # TODO
     when Command::DisputeCreate
       DisputeCreateCommand.exec(opts)
     when Command::DisputeFinalize
-      # TODO
+      DisputeFinalizeCommand.exec(ids)
     when Command::DisputeFind
       DisputeFindCommand.exec(ids, opts)
     when Command::DisputeSearch
