@@ -154,20 +154,6 @@ module Braintree
       end
     end
 
-    # def initialize(hash : Hash(String,String))
-    #   @amount = hash["amount"]
-    #   @credit_card = {
-    #     number: hash["card_number"],
-    #     expiration: hash["card_expiration"]
-    #   }
-    # end
-
-    # def self.create(*args, **kargs)
-    #   CreateTransaction.exec(*args, **kargs) do |op, tx|
-    #     yield op, tx
-    #   end
-    # end
-
     def arn
       acquirer_reference_number
     end
