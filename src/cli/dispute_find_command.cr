@@ -1,5 +1,5 @@
 class Braintree::CLI::DisputeFindCommand
-  def self.exec(ids : Array(String), options : Hash(Symbol, String))
+  def self.run(ids : Array(String), options : Hash(Symbol, String))
     ids.each do |dispute_id|
       if options[:source]? == "local"
         dispute = Dispute.load(dispute_id)
@@ -15,11 +15,12 @@ class Braintree::CLI::DisputeFindCommand
           exit 1
         end
       end
+
+      exit
     end
   end
 
   def self.render(dispute)
     puts "dispute found" # TODO output more
-    exit
   end
 end

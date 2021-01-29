@@ -80,9 +80,9 @@ class Braintree::CLI
             banner = parser.to_s
           }
           parser.separator("Types")
-          parser.on("-t", "--text TEXT", "adds text evidenxe") { |_t| opts[:text] = _t }
-          parser.on("-f", "--file PATH", "path to file") { |_f| opts[:file] = _f }
-          parser.on("-r", "--remove", "removes evidence for dispute") { |_r| opts[:remove] = _r }
+          parser.on("-t TEXT", "--text TEXT", "adds text evidenxe") { |_t| opts[:text] = _t }
+          parser.on("-f PATH", "--file PATH", "path to file") { |_f| opts[:file] = _f }
+          parser.on("-r ID", "--remove ID", "removes evidence for dispute") { |_id| opts[:remove] = _id }
         end
 
         parser.separator("Subcommands")
@@ -117,8 +117,7 @@ class Braintree::CLI
         parser.unknown_args do |pre_dash, post_dash|
           Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }
           if !pre_dash.empty? || !post_dash.empty?
-            # TODO: maybe move to top of dispute parser
-            command = Command::DisputeFind
+            command = Command::DisputeFind if command == Command::Banner
             ids = pre_dash
           end
         end
@@ -140,17 +139,17 @@ class Braintree::CLI
     when Command::Error
       exit 1
     when Command::DisputeAccept
-      DisputeAcceptCommand.exec(ids)
+      DisputeAcceptCommand.run(ids)
     when Command::DisputeEvidence
-      # TODO
+      DisputeEvidenceCommand.run(ids, opts)
     when Command::DisputeCreate
-      DisputeCreateCommand.exec(opts)
+      DisputeCreateCommand.run(opts)
     when Command::DisputeFinalize
-      DisputeFinalizeCommand.exec(ids)
+      DisputeFinalizeCommand.run(ids)
     when Command::DisputeFind
-      DisputeFindCommand.exec(ids, opts)
+      DisputeFindCommand.run(ids, opts)
     when Command::DisputeSearch
-      # TODO
+      DisputeSearchCommand.run(opts)
     else
       STDERR.puts "ERROR: you found an error in the CLI please consider submitting an issue"
       exit 1

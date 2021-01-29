@@ -15,9 +15,9 @@ class Braintree::Operations::CreateTransaction < BTO::Operation
   end
 
   def exec
-    response = Braintree.http.post(
+    response = BT.http.post(
       path: "/merchants/#{BT.settings.merchant}/transactions",
-      body: Braintree.xml { |t|
+      body: BT.xml { |t|
         t.transaction {
           t.amount amount
           t.credit_card {

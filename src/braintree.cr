@@ -110,9 +110,11 @@ module Braintree
       client.before_request do |request|
         request.headers["Authorization"] = "Bearer #{Braintree.auth_token}"
         request.headers["x-apiversion"] = "6"
-        request.headers["User-Agent"] = "Totally Unoffical Crystal Client / 0.1"
-        # request.headers["Accept"]        = "application/json"
-        request.headers["Content-Type"] = "application/xml"
+        request.headers["User-Agent"] = "Totally Unoffical Crystal Client / #{Braintree::VERSION}"
+        request.headers["Accept"] = "application/xml"
+        request.headers["Content-Type"] = "application/xml" unless request.headers["Content-Type"]?
+        request.headers.each{ |h| Log.debug { h } }
+        Log.debug { request.body }
       end
       client
     end

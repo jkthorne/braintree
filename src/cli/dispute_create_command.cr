@@ -6,7 +6,7 @@ class Braintree::CLI::DisputeCreateCommand
       card_expiration: options.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
     ).exec do |op, dispute|
       if dispute
-        dispute.store if options[:source]? == "remote"
+        dispute.store
         STDERR.puts "Dispute(#{dispute.as(Dispute).id}) Created with options #{options}"
         exit
       else
@@ -17,7 +17,7 @@ class Braintree::CLI::DisputeCreateCommand
     end
   end
 
-  def self.exec(options : Hash(Symbol, String))
+  def self.run(options : Hash(Symbol, String))
     if options[:exp_date]?
       expiration_month, expiration_year = options[:exp_date].split("/")
       expiration_date = Time.utc(year: expiration_year.to_i, month: expiration_month.to_i, day: 1)

@@ -1,8 +1,9 @@
-class Braintree::Operations::Dispute::AddTextEvidence < BTO::Operation
+class Braintree::Operations::Dispute::AddFileEvidence < BTO::Operation
   getter dispute_id : String
-  getter content : String
+  getter document_id : String
+  getter category : String?
 
-  def initialize(@dispute_id, @content)
+  def initialize(@dispute_id, @document_id, @category = nil)
   end
 
   def self.exec(*args, **kargs)
@@ -12,13 +13,13 @@ class Braintree::Operations::Dispute::AddTextEvidence < BTO::Operation
   end
 
   def exec
-    # # TODO: move to @request
     request = HTTP::Request.new(
       method: "POST",
       resource: "/merchants/#{BT.settings.merchant}/disputes/#{dispute_id}/evidence",
       body: Braintree.xml { |t|
         t.evidence {
-          t.comments content
+          t.document_upload_id document_id
+          t.category category.not_nil! if category
         }
       }
     )
