@@ -11,7 +11,7 @@ class Braintree::Models::Disputes
   def initialize
   end
 
-  def initialize(@xml : XML::Node, @transaction : Transaction? = nil)
+  def initialize(@xml : XML::Node)
     @current_page_number = xml.xpath_node("./disputes/current-page-number").not_nil!.text.to_i
     @page_size = xml.xpath_node("./disputes/page-size").not_nil!.text.to_i
     @total_items = xml.xpath_node("./disputes/total-items").not_nil!.text.to_i

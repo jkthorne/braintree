@@ -36,6 +36,28 @@ class Braintree::Models::Dispute
     Chargeback = "4023898493988028"
   end
 
+  class ShallowTransaction
+    getter id : String
+    getter global_id : String
+    getter amount : String
+    getter created_at : String
+    getter installment_count : String?
+    getter order_id : String?
+    getter purchase_order_number : String?
+    getter payment_instrument_subtype : String
+
+    def initialize(xml)
+      @id = xml.xpath_node("./id").not_nil!.text
+      @global_id = xml.xpath_node("./global-id").not_nil!.text
+      @amount = xml.xpath_node("./amount").not_nil!.text
+      @created_at = xml.xpath_node("./created-at").not_nil!.text
+      @installment_count = xml.xpath_node("./installment-count").try &.text
+      @order_id = xml.xpath_node("./order-id").try &.text
+      @purchase_order_number = xml.xpath_node("./purchase-order-number").try &.text
+      @payment_instrument_subtype = xml.xpath_node("./payment-instrument-subtype").not_nil!.text
+    end
+  end
+
   getter id : String
   getter global_id : String
   getter amount : String          # TODO: money
@@ -65,6 +87,7 @@ class Braintree::Models::Dispute
   # getter transaction
 
   getter xml : XML::Node?
+  getter shallow_transaction : ShallowTransaction?
   getter transaction : Transaction?
 
   def initialize(@xml : XML::Node, @transaction : Transaction? = nil)
@@ -93,6 +116,14 @@ class Braintree::Models::Dispute
     @status = xml.xpath_node("./status").not_nil!.text
     @updated_at = Time.parse_iso8601 xml.xpath_node("./updated-at").not_nil!.text
     @original_dispute_id = xml.xpath_node("./original-dispute-id").not_nil!.text
+
+    if xml.xpath_node("./transaction")
+      @shallow_transaction = ShallowTransaction.new(xml.xpath_node("./transaction"))
+    end
+  end
+
+  def expand
+    @transcation.try &.expand
   end
 
   def store

@@ -3,6 +3,8 @@ require "option_parser"
 require "file_utils"
 require "ini"
 
+# TODO: singilton
+# TODO: remote as a method
 class Braintree::CLI
   enum Command
     None

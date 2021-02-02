@@ -153,15 +153,19 @@ class Braintree::Models::Transaction
     end
   end
 
-  def arn
-    acquirer_reference_number
-  end
-
   def store
     File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
   end
 
   def self.load(id)
     new(File.read(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s))
+  end
+
+  def expand
+    # TODO: request full data
+  end
+
+  def arn
+    acquirer_reference_number
   end
 end
