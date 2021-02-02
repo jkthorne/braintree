@@ -46,7 +46,7 @@ class Braintree::Models::Dispute
     getter purchase_order_number : String?
     getter payment_instrument_subtype : String
 
-    def initialize(xml)
+    def initialize(xml : XML::Node)
       @id = xml.xpath_node("./id").not_nil!.text
       @global_id = xml.xpath_node("./global-id").not_nil!.text
       @amount = xml.xpath_node("./amount").not_nil!.text
@@ -117,8 +117,8 @@ class Braintree::Models::Dispute
     @updated_at = Time.parse_iso8601 xml.xpath_node("./updated-at").not_nil!.text
     @original_dispute_id = xml.xpath_node("./original-dispute-id").not_nil!.text
 
-    if xml.xpath_node("./transaction")
-      @shallow_transaction = ShallowTransaction.new(xml.xpath_node("./transaction"))
+    if transaction_node = xml.xpath_node("./transaction")
+      @shallow_transaction = ShallowTransaction.new(transaction_node)
     end
   end
 
@@ -149,7 +149,8 @@ class Braintree::Models::Dispute
       reason,
       reason_code,
       reply_by_date.to_s("%F"),
-      status
+      status,
+      shallow_transaction.nil? ? "N/A" : shallow_transaction.not_nil!.id 
     ]
   end
 
@@ -170,6 +171,7 @@ class Braintree::Models::Dispute
       t.add_column("Reason Code", width: 11) { |n| n[10] }
       t.add_column("Reply By Date", width: 13) { |n| n[11] }
       t.add_column("Status", width: 8) { |n| n[12] }
+      t.add_column("TX ID", width: 8) { |n| n[13] }
     end
 
     io.puts table

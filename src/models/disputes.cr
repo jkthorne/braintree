@@ -46,6 +46,7 @@ class Braintree::Models::Disputes
       t.add_column("Reason Code", width: 11) { |n| n[10] }
       t.add_column("Reply By Date", width: 13) { |n| n[11] }
       t.add_column("Status", width: 8) { |n| n[12] }
+      t.add_column("TX ID", width: 8) { |n| n[13] }
     end
 
     io.puts table
