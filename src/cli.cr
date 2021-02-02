@@ -10,6 +10,7 @@ class Braintree::CLI
     None
     Banner
     Error
+    TransactionFind
     DisputeAccept
     DisputeEvidence
     DisputeCreate
@@ -23,6 +24,8 @@ class Braintree::CLI
   
   private property options = {} of Symbol => String
   getter options = {} of Symbol => String
+  private property object_ids = [] of String
+  getter object_ids = [] of String
   getter input_io : IO
   getter data_io : IO
   getter human_io : IO
@@ -37,8 +40,6 @@ class Braintree::CLI
   end
 
   def run
-    ids = [] of String
-    # options = {} of Symbol => String
     banner = nil
 
     command = Command::Banner
@@ -53,7 +54,17 @@ class Braintree::CLI
       parser.on("-s", "--silent", "do not show human readable output") { setup_null_output }
 
       parser.separator("Subcommands")
-      parser.on("dispute", "Interact with disputes") do
+      parser.on("transaction", "Transaction based subcommands") do
+        parser.unknown_args do |pre_dash, post_dash|
+          Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }
+          if !pre_dash.empty? || !post_dash.empty?
+            command = Command::TransactionFind if command == Command::Banner
+            object_ids.concat(pre_dash)
+          end
+        end
+      end
+
+      parser.on("dispute", "Disputes based subcommands") do
         parser.banner = "Usage: bt disputes [subcommand|ids] [switches]"
         parser.on("-h", "--help", "Prints this dialog") {
           command = Command::Banner
@@ -128,7 +139,7 @@ class Braintree::CLI
           Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }
           if !pre_dash.empty? || !post_dash.empty?
             command = Command::DisputeFind if command == Command::Banner
-            ids = pre_dash
+            object_ids.concat(pre_dash)
           end
         end
       end
@@ -141,32 +152,35 @@ class Braintree::CLI
     end
     banner ||= main_parser.to_s
 
+    # TODO: Parse into objects??
     if !input_io.tty?
       ARGF.each_line do |line|
         human_io.puts "LINE: #{line}"
-        ids << line.split(ENV.fetch("FS", " "))[0]
+        object_ids << line.split(ENV.fetch("FS", " "))[0]
       end
     end
 
     Log.debug { "command selected: #{command}" }
     Log.debug { "with options: #{options}" }
-    Log.debug { "with ids: #{ids}" }
+    Log.debug { "with ids: #{object_ids}" }
     case command
     when Command::Banner
       STDERR.puts banner
       exit
     when Command::Error
       exit 1
+    when Command::TransactionFind
+      TransactionFindCommand.run(self)
     when Command::DisputeAccept
-      DisputeAcceptCommand.run(ids)
+      DisputeAcceptCommand.run(object_ids)
     when Command::DisputeEvidence
-      DisputeEvidenceCommand.run(ids, options)
+      DisputeEvidenceCommand.run(object_ids, options)
     when Command::DisputeCreate
       DisputeCreateCommand.run(self)
     when Command::DisputeFinalize
-      DisputeFinalizeCommand.run(ids)
+      DisputeFinalizeCommand.run(object_ids)
     when Command::DisputeFind
-      DisputeFindCommand.run(ids, options)
+      DisputeFindCommand.run(self)
     when Command::DisputeSearch
       DisputeSearchCommand.run(self)
     else

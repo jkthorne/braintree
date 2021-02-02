@@ -62,7 +62,7 @@ class Braintree::Models::Transaction
   getter network_transaction_id : String
   getter processor_response_type : String
   getter authorization_expires_at : Time
-  # <retry-ids type="array"/>
+  # retry-ids type="array"/>
   getter retried_transaction_id : String?
   # getter refund_global_ids
   # getter partial_settlement_transaction_global_ids
@@ -148,7 +148,7 @@ class Braintree::Models::Transaction
     @terminal_identification_number = xml.xpath_node("./transaction/terminal-identification-number").not_nil!.text
     @merchant_name = xml.xpath_node("./transaction/merchant-name").not_nil!.text
 
-    xml.xpath_nodes("./transaction/disputes/dispute").try &.each do |child|
+    xml.xpath_nodes("./transaction/disputes").try &.each do |child|
       @disputes << Dispute.new(child)
     end
   end
@@ -158,7 +158,57 @@ class Braintree::Models::Transaction
   end
 
   def self.load(id)
-    new(File.read(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s))
+    path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
+    if File.exists?(path)
+      dispute = new(XML.parse(File.read(path)))
+      Log.debug { "Transaction(#{id}) loaded from local store" }
+      dispute
+    else
+      Log.debug { "Transaction(#{id}) failed to loaded from local store" }
+      nil
+    end
+  end
+
+  def output_fields
+    [
+      id,
+      status,
+      type,
+      amount,
+      currency_iso_code,
+      merchant_account_id,
+      refund_id ? refund_id : "N/A",
+      gateway_rejection_reason ? gateway_rejection_reason : "N/A",
+      processor_response_code,
+      plan_id ? plan_id : "N/A",
+      subscription_id ? subscription_id : "N/A",
+      recurring
+    ]
+  end
+
+  def human_view(io = STDERR)
+    data = [ output_fields ]
+
+    table = Tablo::Table.new(data) do |t|
+      t.add_column("ID", width: 8) { |n| n[0]}
+      t.add_column("Status", width: 7) { |n| n[1]}
+      t.add_column("Type", width: 4) { |n| n[2]}
+      t.add_column("Amount", width: 6) { |n| n[4]}
+      t.add_column("Currency ISO") { |n| n[3]}
+      t.add_column("Merchant Account ID", width: 19) { |n| n[5]}
+      t.add_column("Refund ID") { |n| n[6]}
+      t.add_column("Gateway Rejection Reason", width: 24) { |n| n[7]}
+      t.add_column("Processor Response Code", width: 23) { |n| n[8]}
+      t.add_column("Plan ID", width: 8) { |n| n[9]}
+      t.add_column("Subscription ID", width: 15) { |n| n[10]}
+      t.add_column("Recurring") { |n| n[11]}
+    end
+
+    io.puts table
+  end
+
+  def machine_view(io = STDOUT)
+    io.puts output_fields.map(&.to_s).join(" ")
   end
 
   def expand

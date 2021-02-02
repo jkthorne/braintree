@@ -14,10 +14,10 @@ class Braintree::CLI::DisputeSearchCommand
   def self.render(disputes, cli)
     cli.human_io.puts "found #{disputes.total_items} dispute found"
     cli.human_io.puts "displaying #{disputes.disputes.size} on page #{disputes.current_page_number}"
-    if !STDOUT.tty?
-      disputes.machine_view
+    if cli.human_io.tty?
+      disputes.human_view(cli.human_io)
     else
-      disputes.human_view
+      disputes.machine_view(cli.data_io)
     end
   end
 end

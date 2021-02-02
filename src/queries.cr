@@ -10,4 +10,4 @@ end
 
 alias BTQ = Braintree::Queries
 
-require "./queries/*"
+require "./queries/**"

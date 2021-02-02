@@ -15,7 +15,7 @@ class Braintree::Models::Disputes
     @current_page_number = xml.xpath_node("./disputes/current-page-number").not_nil!.text.to_i
     @page_size = xml.xpath_node("./disputes/page-size").not_nil!.text.to_i
     @total_items = xml.xpath_node("./disputes/total-items").not_nil!.text.to_i
-    xml.xpath_nodes("./disputes/dispute").try &.each do |child|
+    xml.xpath_nodes("./disputes").try &.each do |child|
       @disputes << Dispute.new(child)
     end
   end
@@ -30,7 +30,7 @@ class Braintree::Models::Disputes
   end
 
   def human_view(io = STDERR)
-    data = disputes.map { |d| d.ascii_data }
+    data = disputes.map { |d| d.output_fields }
 
     table = Tablo::Table.new(data) do |t|
       t.add_column("ID", width: 16) { |n| n[0] }
@@ -54,7 +54,7 @@ class Braintree::Models::Disputes
 
   def machine_view(io = STDOUT)
     disputes.each do |d|
-      io.puts d.ascii_data.map(&.to_s).join(" ")
+      io.puts d.output_fields.map(&.to_s).join(" ")
     end
   end
 

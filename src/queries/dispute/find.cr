@@ -5,9 +5,7 @@ class Braintree::Queries::Dispute::Find < BTQ::Query
   end
 
   def exec
-    response = Braintree.http.get(
-      path: "/merchants/#{BT.settings.merchant}/disputes/#{id}"
-    )
+    response = Braintree.http.get("/merchants/#{BT.settings.merchant}/disputes/#{id}")
 
     yield response, response.success? ? BT::Models::Dispute.new(XML.parse(response.body)) : nil
   end
