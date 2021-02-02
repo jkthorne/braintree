@@ -2,6 +2,7 @@ require "log"
 require "http/client"
 require "json"
 require "xml"
+require "csv"
 
 require "habitat"
 require "dotenv"

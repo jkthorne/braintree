@@ -38,7 +38,7 @@ TODO: Write development instructions here
 
 - [your-name-here](https://github.com/your-github-user) - creator and maintainer
 
-
+./bin/bt dispute search -s open -a 100,200 | awk '$2>123.45' | ./bin/bt dispute -A
 
 # pp(
 #   GQL.client(

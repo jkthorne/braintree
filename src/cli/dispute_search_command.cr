@@ -1,19 +1,23 @@
 class Braintree::CLI::DisputeSearchCommand
-  def self.run(options : Hash(Symbol, String))
-    BTQ::Dispute::Search.exec(options) do |op, disputes|
+  def self.run(cli)
+    BTQ::Dispute::Search.exec(cli.options) do |op, disputes|
       if disputes
         disputes.store
-        render disputes
+        render(disputes, cli)
       else
-        STDERR.puts "failed to search dispute"
+        cli.human_io.puts "failed to search dispute"
         exit 1
       end
     end
   end
 
-  def self.render(disputes)
-    STDERR.puts "found #{disputes.total_items} dispute found"
-    STDERR.puts "displaying #{disputes.disputes.size} on page #{disputes.current_page_number}"
-    disputes.ascii_view
+  def self.render(disputes, cli)
+    cli.human_io.puts "found #{disputes.total_items} dispute found"
+    cli.human_io.puts "displaying #{disputes.disputes.size} on page #{disputes.current_page_number}"
+    if !STDOUT.tty?
+      disputes.machine_view
+    else
+      disputes.human_view
+    end
   end
 end

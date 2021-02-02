@@ -1,11 +1,15 @@
 class Braintree::Models::Disputes
-  getter current_page_number : Int32
-  getter page_size : Int32
-  getter total_items : Int32
+  # TODO: extract page info
+  getter current_page_number : Int32?
+  getter page_size : Int32?
+  getter total_items : Int32?
 
   getter disputes = [] of Models::Dispute
 
   getter xml : XML::Node?
+
+  def initialize
+  end
 
   def initialize(@xml : XML::Node, @transaction : Transaction? = nil)
     @current_page_number = xml.xpath_node("./disputes/current-page-number").not_nil!.text.to_i
@@ -25,12 +29,12 @@ class Braintree::Models::Disputes
     new(XML.parse(File.read(path))) if File.exists?(path)
   end
 
-  def ascii_view(io = STDERR)
+  def human_view(io = STDERR)
     data = disputes.map { |d| d.ascii_data }
 
     table = Tablo::Table.new(data) do |t|
       t.add_column("ID", width: 16) { |n| n[0] }
-      t.add_column("Amount", width: 6) { |n| n[1] }
+      t.add_column("Amount", width: 7) { |n| n[1] }
       t.add_column("Amount Disputed", width: 15) { |n| n[2] }
       t.add_column("Amount Won", width: 10) { |n| n[3] }
       t.add_column("Case Number", width: 14) { |n| n[4] }
@@ -45,5 +49,15 @@ class Braintree::Models::Disputes
     end
 
     io.puts table
+  end
+
+  def machine_view(io = STDOUT)
+    disputes.each do |d|
+      io.puts d.ascii_data.map(&.to_s).join(" ")
+    end
+  end
+
+  def <<(dispute : Dispute)
+    @disputes << dispute
   end
 end

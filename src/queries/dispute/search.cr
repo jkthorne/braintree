@@ -2,13 +2,18 @@ class Braintree::Queries::Dispute::Search < BTQ::Query
   private getter options : Hash(Symbol, String)
 
   def initialize(@options)
+    # TODO: build page info
   end
 
   def exec
-    page_num = options[:page_num]? ? options[:page_num] : 1
+    uri = URI.new
+    uri.path = "/merchants/#{BT.settings.merchant}/disputes/advanced_search"
+    params = URI::Params.new
+    params["page"] = options[:page_num]? ? options[:page_num] : "1"
+    uri.query_params = params
 
     response = Braintree.http.post(
-      path: "/merchants/#{BT.settings.merchant}/disputes/advanced_search?page=#{page_num}",
+      path: uri.request_target,
       body: search_params
     )
 
@@ -19,8 +24,8 @@ class Braintree::Queries::Dispute::Search < BTQ::Query
     @seach_params ||= XML.build do |xml|
       xml.element("search") {
         search_params_amount(xml)
-        search_params_kind(xml)
         search_params_status(xml)
+        search_params_kind(xml)
       }
     end
   end

@@ -122,12 +122,12 @@ class Braintree::Models::Dispute
     ]
   end
 
-  def ascii_view(io = STDERR)
+  def human_view(io = STDERR)
     data = [ ascii_data ]
 
     table = Tablo::Table.new(data) do |t|
       t.add_column("ID", width: 16) { |n| n[0] }
-      t.add_column("Amount", width: 6) { |n| n[1] }
+      t.add_column("Amount", width: 7) { |n| n[1] }
       t.add_column("Amount Disputed", width: 15) { |n| n[2] }
       t.add_column("Amount Won", width: 10) { |n| n[3] }
       t.add_column("Case Number", width: 14) { |n| n[4] }
