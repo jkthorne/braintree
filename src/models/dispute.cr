@@ -1,8 +1,45 @@
-class Braintree::Dispute
+class Braintree::Models::Dispute
+  module Status
+    Accepted = "accepted"
+    Disputed = "disputed"
+    Expired  = "expired"
+    Open     = "open"
+    Lost     = "lost"
+    Won      = "won"
+
+    ALL = [Accepted, Disputed, Expired, Open, Lost, Won]
+  end
+
+  module Reason
+    CancelledRecurringTransaction = "cancelled_recurring_transaction"
+    CreditNotProcessed            = "credit_not_processed"
+    Duplicate                     = "duplicate"
+    Fraud                         = "fraud"
+    General                       = "general"
+    InvalidAccount                = "invalid_account"
+    NotRecognized                 = "not_recognized"
+    ProductNotReceived            = "product_not_received"
+    ProductUnsatisfactory         = "product_unsatisfactory"
+    TransactionAmountDiffers      = "transaction_amount_differs"
+    Retrieval                     = "retrieval"
+  end
+
+  module Kind
+    Chargeback     = "chargeback"
+    PreArbitration = "pre_arbitration"
+    Retrieval      = "retrieval"
+
+    ALL = [Chargeback, PreArbitration, Retrieval]
+  end
+
+  module CreditCard
+    Chargeback = "4023898493988028"
+  end
+
   getter id : String
   getter global_id : String
-  getter amount : String          # # TODO: money
-  getter amount_disputed : String # # TODO: money
+  getter amount : String          # TODO: money
+  getter amount_disputed : String # TODO: money
   getter amount_won : String
   getter case_number : String
   getter created_at : Time
@@ -23,7 +60,7 @@ class Braintree::Dispute
   getter status : String
   getter updated_at : Time
   getter original_dispute_id : String
-  # evidence
+  # getter evidence
   # getter status_history
   # getter transaction
 
@@ -65,5 +102,45 @@ class Braintree::Dispute
   def self.load(id)
     path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
     new(XML.parse(File.read(path))) if File.exists?(path)
+  end
+
+  def ascii_data
+    [
+      id,
+      amount,
+      amount_disputed,
+      amount_won,
+      case_number,
+      currency_iso_code,
+      date_opened.to_s("%F"),
+      date_won ? date_won : "N/A",
+      kind,
+      reason,
+      reason_code,
+      reply_by_date.to_s("%F"),
+      status
+    ]
+  end
+
+  def ascii_view(io = STDERR)
+    data = [ ascii_data ]
+
+    table = Tablo::Table.new(data) do |t|
+      t.add_column("ID", width: 16) { |n| n[0] }
+      t.add_column("Amount", width: 6) { |n| n[1] }
+      t.add_column("Amount Disputed", width: 15) { |n| n[2] }
+      t.add_column("Amount Won", width: 10) { |n| n[3] }
+      t.add_column("Case Number", width: 14) { |n| n[4] }
+      t.add_column("Code ISO", width: 8) { |n| n[5] }
+      t.add_column("Date Opened", width: 11) { |n| n[6] }
+      t.add_column("Date Won", width: 10) { |n| n[7] }
+      t.add_column("Kind") { |n| n[8] }
+      t.add_column("Reason", width: 6) { |n| n[9] }
+      t.add_column("Reason Code", width: 11) { |n| n[10] }
+      t.add_column("Reply By Date", width: 13) { |n| n[11] }
+      t.add_column("Status", width: 8) { |n| n[12] }
+    end
+
+    io.puts table
   end
 end

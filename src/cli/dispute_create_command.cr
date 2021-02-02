@@ -7,7 +7,7 @@ class Braintree::CLI::DisputeCreateCommand
     ).exec do |op, dispute|
       if dispute
         dispute.store
-        STDERR.puts "Dispute(#{dispute.as(Dispute).id}) Created with options #{options}"
+        STDERR.puts "Dispute(#{dispute.id}) Created with options #{options}"
         exit
       else
         STDERR.puts "Failed to create dispute with options #{options}"

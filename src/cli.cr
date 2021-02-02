@@ -92,26 +92,27 @@ class Braintree::CLI
             command = Command::Banner
             banner = parser.to_s
           }
+          parser.separator("Pagination")
+          parser.on("-P NUM", "--page_num NUM", "results page number") { |_p| opts[:page_num] = _p }
+          parser.on("-S SIZE", "--page_size SIZE", "results page size") { |_s| opts[:page_size] = _s }
+          parser.on("-A", "--all", "gets all results") { opts[:all] = "all" }
           parser.separator("Search Criteria")
-          parser.on("-a AMOUNT", "--amount AMOUNT", "amount range (100,200)") { |_a| opts[:amount] = _a }
-          parser.on("-s STATUS", "--status STATUS", "status (open,won,lost)") { |_s| opts[:status] = _s }
+          parser.on("-a AMOUNTS", "--amount AMOUNTS", "amount_disputed range (100,200)") { |_a| opts[:amounts] = _a }
+          parser.on("-s STATUS", "--status STATUS", "status (open,won,lost)") { |_s| opts[:status] = opts[:status]? ? "#{opts[:status]},#{_s}" : _s }
           parser.on("-c NUM", "--case NUM", "case number") { |_c| opts[:case_number] = _c }
           parser.on("-C ID", "--customer ID", "customer id") { |_c| opts[:customer_id] = _c }
           parser.on("-d DATE", "--disbursment_date DATE", "disbursment date") { |_d| opts[:disbursment_date] = _d }
-          parser.on("-s DATE", "--effective_date DATE", "effective date") { |_e| opts[:effective_date] = _e }
+          parser.on("-e DATE", "--effective_date DATE", "effective date") { |_e| opts[:effective_date] = _e }
           parser.on("-i ID", "--id ID", "dispute id") { |_i| opts[:dispute_id] = _i }
-          parser.on("-k KIND", "--kind KIND", "kind") do |_k|
-            opts[:kind] = opts[:kind]? ? "#{opts[:kind]},#{_k}" : opts[:kind]
-          end
+          parser.on("-k KIND", "--kind KIND", "kind") { |_k| opts[:kind] = opts[:kind]? ? "#{opts[:kind]},#{_k}" : _k }
           parser.on("-m ID", "--merchant_account_id ID", "merchant account id") { |_k| opts[:merchant_account_id] = _k }
           parser.on("-r REASON", "--reason REASON", "reason") { |_r| opts[:reason] = _r }
           parser.on("-R CODE", "--reason_code CODE", "reason_code") { |_r| opts[:reason_code] = _r }
           parser.on("-D DATE", "--received_date DATE", "received date") { |_r| opts[:received_date] = _r }
           parser.on("-n NUM", "--reference_number NUM", "reference number") { |_r| opts[:reference_number] = _r }
           parser.on("-b DATE", "--reply_by_date DATE", "reply by date") { |_r| opts[:reply_by_date] = _r }
-          parser.on("-S STATUS", "--status STATUS", "status") { |_s| opts[:status] = _s }
-          parser.on("-t ID", "--transaction_id ID", "transaction_id") { |_t| opts[:transaction_id] = _t }
-          parser.on("-T SOURCE", "--transaction_source SOURCE", "transaction_source") { |_t| opts[:transaction_source] = _t }
+          parser.on("-t ID", "--tx_id ID", "transaction id") { |_t| opts[:transaction_id] = _t }
+          parser.on("-T SOURCE", "--tx_source SOURCE", "transaction source") { |_t| opts[:transaction_source] = _t }
         end
 
         parser.unknown_args do |pre_dash, post_dash|
@@ -132,6 +133,7 @@ class Braintree::CLI
     banner ||= main_parser.to_s
 
     Log.debug { "command selected: #{command}" }
+    Log.debug { "with options: #{opts}" }
     case command
     when Command::Banner
       STDERR.puts banner

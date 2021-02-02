@@ -17,3 +17,5 @@ dependencies:
     github: wontruefree/gql
   factory:
     github: imdrasil/factory
+  tablo:
+    github: hutou/tablo

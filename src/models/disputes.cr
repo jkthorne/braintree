@@ -3,7 +3,7 @@ class Braintree::Models::Disputes
   getter page_size : Int32
   getter total_items : Int32
 
-  getter disputes = [] of Dispute
+  getter disputes = [] of Models::Dispute
 
   getter xml : XML::Node?
 
@@ -23,5 +23,27 @@ class Braintree::Models::Disputes
   def self.load(id)
     path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
     new(XML.parse(File.read(path))) if File.exists?(path)
+  end
+
+  def ascii_view(io = STDERR)
+    data = disputes.map { |d| d.ascii_data }
+
+    table = Tablo::Table.new(data) do |t|
+      t.add_column("ID", width: 16) { |n| n[0] }
+      t.add_column("Amount", width: 6) { |n| n[1] }
+      t.add_column("Amount Disputed", width: 15) { |n| n[2] }
+      t.add_column("Amount Won", width: 10) { |n| n[3] }
+      t.add_column("Case Number", width: 14) { |n| n[4] }
+      t.add_column("Code ISO", width: 8) { |n| n[5] }
+      t.add_column("Date Opened", width: 11) { |n| n[6] }
+      t.add_column("Date Won", width: 10) { |n| n[7] }
+      t.add_column("Kind") { |n| n[8] }
+      t.add_column("Reason", width: 6) { |n| n[9] }
+      t.add_column("Reason Code", width: 11) { |n| n[10] }
+      t.add_column("Reply By Date", width: 13) { |n| n[11] }
+      t.add_column("Status", width: 8) { |n| n[12] }
+    end
+
+    io.puts table
   end
 end

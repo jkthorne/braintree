@@ -6,7 +6,8 @@ require "xml"
 require "habitat"
 require "dotenv"
 require "gql"
-require "factory"
+require "factory" # # TODO: remove
+require "tablo"
 
 require "./constants"
 require "./xml_builder"
@@ -113,7 +114,7 @@ module Braintree
         request.headers["User-Agent"] = "Totally Unoffical Crystal Client / #{Braintree::VERSION}"
         request.headers["Accept"] = "application/xml"
         request.headers["Content-Type"] = "application/xml" unless request.headers["Content-Type"]?
-        request.headers.each{ |h| Log.debug { h } }
+        request.headers.each { |h| Log.debug { h } }
         Log.debug { request.body }
       end
       client

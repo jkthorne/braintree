@@ -2,7 +2,7 @@ class Braintree::CLI::DisputeFindCommand
   def self.run(ids : Array(String), options : Hash(Symbol, String))
     ids.each do |dispute_id|
       if options[:source]? == "local"
-        dispute = Dispute.load(dispute_id)
+        dispute = BT::Models::Dispute.load(dispute_id)
         render dispute if dispute
         exit
       end
