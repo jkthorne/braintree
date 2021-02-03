@@ -2,7 +2,11 @@ name: braintree
 version: 0.1.0
 
 authors:
-  - your-name-here <your-email-here>
+  - Jack Thorne <jack@kilmer.co>
+
+targets:
+  bt:
+    main: src/cli.cr
 
 crystal: 0.35.1
 

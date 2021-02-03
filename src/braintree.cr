@@ -27,6 +27,18 @@ module Braintree
     setting merchant : String
   end
 
+  def self.home_dir
+    Path.home
+  end
+
+  def self.config_dir
+    home_dir / ".config" / "bt"
+  end
+
+  def self.data_dir
+    home_dir / ".local" / "share" / "bt"
+  end
+
   @@graph_host : URI?
 
   def self.graph_host
@@ -130,9 +142,29 @@ module Braintree
     end
   end
 
-  # def self.transaction(**kargs)
-  #   Transaction.new(**kargs)
-  # end
+  def self.load_config!
+    path = (config_dir / "config.ini").expand(home: true)
+
+    if File.exists?(path.to_s)
+      config = INI.parse(File.read(path.to_s))
+      Braintree.configure do |settings|
+        settings.merchant = config.dig("braintree", "merchant")
+        settings.public_key = config.dig("braintree", "public_key")
+        settings.private_key = config.dig("braintree", "private_key")
+      end
+    else
+      Braintree.configure do |settings|
+        print "Enter merchant id: "
+        settings.merchant = gets.to_s
+        print "Enter public key: "
+        settings.public_key = gets.to_s
+        print "Enter private key: "
+        settings.private_key = gets.to_s
+      end
+      FileUtils.mkdir_p(path.parent.to_s)
+      File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
+    end
+  end
 end
 
 alias BT = Braintree

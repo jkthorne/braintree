@@ -32,7 +32,7 @@ class Braintree::CLI
 
   def initialize(@input_io = STDIN, @data_io = STDOUT, @human_io = STDERR)
     # TODO: implement status property on cli
-    setup_config
+    BT.load_config!
   end
 
   def self.run
@@ -194,33 +194,12 @@ class Braintree::CLI
     @human_io = File.open(File::NULL, "w")
   end
 
-  def setup_config
-    path = Path["~/.config/bt/config.ini"].expand(home: true)
-
-    if File.exists?(path.to_s)
-      config = INI.parse(File.read(path.to_s))
-      Braintree.configure do |settings|
-        settings.merchant = config.dig("braintree", "merchant")
-        settings.public_key = config.dig("braintree", "public_key")
-        settings.private_key = config.dig("braintree", "private_key")
-      end
-    else
-      Braintree.configure do |settings|
-        print "Enter merchant id: "
-        settings.merchant = gets.to_s
-        print "Enter public key: "
-        settings.public_key = gets.to_s
-        print "Enter private key: "
-        settings.private_key = gets.to_s
-      end
-      FileUtils.mkdir_p(path.parent.to_s)
-      File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
-    end
-  end
-
   def color?
     error.tty?
   end
 end
 
 require "./cli/**"
+
+Log.setup_from_env(default_level: :error)
+BT::CLI.run
