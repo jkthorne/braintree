@@ -2,6 +2,31 @@
 
 This is a CLI for interacting with the Braintree API.
 
+## Getting started
+
+### Install Crystal
+
+Refer to the [Crystal Install] page for up to date information on how to install Crystal for your specific system.
+If you are on a Mac brew is the best option.
+
+``` shsh
+brew install crystal
+```
+
+### Build Executable
+
+One you have crystal you need to build the project.  You can do so with the provided build tool.
+
+``` shsh
+shards build
+```
+
+The executable will be in the `bin` directory.
+
+``` sh
+./bin/bt help
+```
+
 ## CLI
 
 ### Configuration
