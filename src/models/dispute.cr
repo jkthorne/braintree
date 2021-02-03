@@ -134,11 +134,8 @@ class Braintree::Models::Dispute
   end
 
   def store
-    # File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
-
     if raw_xml = xml
       fragment = raw_xml.xpath_node(".")
-      puts fragment
       File.write(Path["~/.config/bt/tmp_search.xml"].expand(home: true).to_s, fragment.to_s)
     end
   end
