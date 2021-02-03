@@ -54,6 +54,7 @@ class Braintree::CLI
       parser.on("-s", "--silent", "do not show human readable output") { setup_null_output }
 
       parser.separator("Subcommands")
+
       parser.on("transaction", "Transaction based subcommands") do
         parser.unknown_args do |pre_dash, post_dash|
           Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }

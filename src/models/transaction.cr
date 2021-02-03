@@ -154,11 +154,11 @@ class Braintree::Models::Transaction
   end
 
   def store
-    File.write(BT.data_dir / "#{id}.xml", xml)
+    File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
   end
 
   def self.load(id)
-    path = BT.data_dir / "#{id}.xml"
+    path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
     if File.exists?(path)
       dispute = new(XML.parse(File.read(path)))
       Log.debug { "Transaction(#{id}) loaded from local store" }

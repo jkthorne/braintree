@@ -31,25 +31,16 @@ module Braintree
     Path.home
   end
 
-  @@config_dir : Path?
   def self.config_dir
-    @@config_dir ||= begin
-      path = home_dir / ".config" / "bt"
-      FileUtils.mkdir_p(path.to_s) if !File.exists?(path.to_s)
-      path
-    end
+    home_dir / ".config" / "bt"
   end
 
-  @@data_dir : Path?
   def self.data_dir
-    @@data_dir ||= begin
-      path = home_dir / ".local" / "share" / "bt"
-      FileUtils.mkdir_p(path.to_s) if !File.exists?(path.to_s)
-      path
-    end
+    home_dir / ".local" / "share" / "bt"
   end
 
   @@graph_host : URI?
+
   def self.graph_host
     @@graph_host ||= begin
       host = settings.host.dup
@@ -152,7 +143,7 @@ module Braintree
   end
 
   def self.load_config!
-    path = config_dir / "config.ini"
+    path = (config_dir / "config.ini").expand(home: true)
 
     if File.exists?(path.to_s)
       config = INI.parse(File.read(path.to_s))
