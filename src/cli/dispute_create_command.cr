@@ -13,10 +13,10 @@ class Braintree::CLI::DisputeCreateCommand
         if dispute
           dispute.store
           disputes << dispute
-          cli.human_io.puts "Dispute(#{dispute.id}) Created with options #{cli.options}"
+          cli.human_io.puts "Dispute(#{dispute.id}) Created with options #{cli.options}".colorize(:green)
         else
           success = false
-          cli.human_io.puts "Server status #{op.try &.response.try &.status}" if op.try &.response.try &.status
+          cli.human_io.puts "Server status #{op.try &.response.try &.status}".colorize(:red) if op.try &.response.try &.status
           break
         end
       end

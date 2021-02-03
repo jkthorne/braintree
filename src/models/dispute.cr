@@ -135,13 +135,13 @@ class Braintree::Models::Dispute
 
   def store
     if raw_xml = xml
-      fragment = raw_xml.xpath_node(".")
-      File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, fragment.to_s)
+      fragment = raw_xml.xpath_node("./dispute")
+      File.write((BT.data_dir / "#{id}.xml").to_s, fragment.to_s)
     end
   end
 
   def self.load(id)
-    path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
+    path = (BT.data_dir / "#{id}.xml").to_s
     if File.exists?(path)
       dispute = new(XML.parse(File.read(path)))
       Log.debug { "Dispute(#{id}) loaded from local store" }

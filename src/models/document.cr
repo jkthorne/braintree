@@ -18,11 +18,22 @@ class Braintree::Models::Document
   end
 
   def store
-    File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
+    if raw_xml = xml
+      fragment = raw_xml.xpath_node("./document-upload")
+      File.write((BT.data_dir / "#{id}.xml").to_s, fragment.to_s)
+    end
   end
 
   def self.load(id)
-    path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
-    new(XML.parse(File.read(path))) if File.exists?(path)
+    path = (BT.data_dir / "#{id}.xml").to_s
+
+    if File.exists?(path)
+      document = new(XML.parse(File.read(path)))
+      Log.debug { "Document(#{id}) loaded from local store" }
+      document
+    else
+      Log.debug { "Document(#{id}) failed to loaded from local store" }
+      nil
+    end
   end
 end

@@ -2,6 +2,7 @@ require "./braintree"
 require "option_parser"
 require "file_utils"
 require "ini"
+require "colorize"
 
 # TODO: singilton
 # TODO: remote as a method
@@ -17,6 +18,11 @@ class Braintree::CLI
     DisputeFinalize
     DisputeFind
     DisputeSearch
+    FileRead
+    FileWrite
+    FileDelete
+    FileList
+    FilePurge
   end
 
   Log = ::Log.for("CLI")
@@ -36,7 +42,7 @@ class Braintree::CLI
   end
 
   def self.run
-    new.run
+    CLI.new.run
   end
 
   def run
@@ -55,18 +61,60 @@ class Braintree::CLI
 
       parser.separator("Subcommands")
 
-      parser.on("transaction", "Transaction based subcommands") do
+      parser.on("data", "Data subcommands") do
+        parser.on("-R", "--read", "reads the file with ID") { command = Command::FileRead }
+        parser.on("-W DATA", "--write DATA", "writes the file with ID") do |_d|
+          command = Command::FileWrite
+          options[:data] = _d
+        end
+        parser.on("-D", "--delete", "deletes the file with ID") { command = Command::FileDelete }
+        parser.on("-L", "--list", "lists all data files") { command = Command::FileList }
+        parser.on("-P", "--purge", "purges all data files") { command = Command::FilePurge }
+
         parser.unknown_args do |pre_dash, post_dash|
-          Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }
+          Log.debug { "File IDs pre: #{pre_dash}, post: #{post_dash}" }
+
+          if !pre_dash.empty? || !post_dash.empty?
+            command = Command::FileRead if command == Command::Banner
+            object_ids.concat(pre_dash)
+          end
+
+          if !input_tty?
+            ARGF.each_line do |line|
+              human_io.puts "Ingested Data: #{line}"
+              object_ids << line.split(ENV.fetch("FS", " "))[0]
+            end
+          end
+
+          command = Command::DisputeFind if command == Command::Banner if 0 < object_ids.size
+        end
+      end
+
+      parser.on("config", "Configurations subcommands") do
+      end
+
+      parser.on("transaction", "Transaction subcommands") do
+        parser.unknown_args do |pre_dash, post_dash|
+          Log.debug { "Transaction IDs pre: #{pre_dash}, post: #{post_dash}" }
+
           if !pre_dash.empty? || !post_dash.empty?
             command = Command::TransactionFind if command == Command::Banner
             object_ids.concat(pre_dash)
           end
+
+          if !input_tty?
+            ARGF.each_line do |line|
+              human_io.puts "Ingested Transaction: #{line}"
+              object_ids << line.split(ENV.fetch("FS", " "))[0]
+            end
+          end
+
+          command = Command::DisputeFind if command == Command::Banner if 0 < object_ids.size
         end
       end
 
-      parser.on("dispute", "Disputes based subcommands") do
-        parser.banner = "Usage: bt disputes [subcommand|ids] [switches]"
+      parser.on("dispute", "Dispute subcommands") do
+        parser.banner = "Usage: bt dispute [subcommand|ids] [switches]"
         parser.on("-h", "--help", "Prints this dialog") {
           command = Command::Banner
           banner = parser.to_s
@@ -79,10 +127,11 @@ class Braintree::CLI
         parser.on("-F", "--finalize", "finalizes the dispute") { command = Command::DisputeFinalize }
         parser.on("-A", "--accept", "accepts a dispute") { command = Command::DisputeAccept }
 
+        parser.separator("Subcommands")
         parser.on("create", "create a new dispute") do
           # TODO: create a fail fast option
           command = Command::DisputeCreate
-          parser.banner = "Usage: bt disputes create [switches]"
+          parser.banner = "Usage: bt dispute create [switches]"
           parser.on("-h", "--help", "Prints this dialog") {
             command = Command::Banner
             banner = parser.to_s
@@ -107,7 +156,6 @@ class Braintree::CLI
           parser.on("-r ID", "--remove ID", "removes evidence for dispute") { |_id| options[:remove] = _id }
         end
 
-        parser.separator("Subcommands")
         parser.on("search", "searches disputes") do
           command = Command::DisputeSearch
           parser.on("-h", "--help", "Prints this dialog") {
@@ -138,11 +186,21 @@ class Braintree::CLI
         end
 
         parser.unknown_args do |pre_dash, post_dash|
-          Log.debug { "other arguments pre: #{pre_dash}, post: #{post_dash}" }
+          Log.debug { "Dispute IDs pre: #{pre_dash}, post: #{post_dash}" }
+
           if !pre_dash.empty? || !post_dash.empty?
             command = Command::DisputeFind if command == Command::Banner
             object_ids.concat(pre_dash)
           end
+
+          if !input_tty?
+            ARGF.each_line do |line|
+              human_io.puts "Ingested Dispute: #{line}"
+              object_ids << line.split(ENV.fetch("FS", " "))[0]
+            end
+          end
+
+          command = Command::DisputeFind if command == Command::Banner if 0 < object_ids.size
         end
       end
 
@@ -154,14 +212,6 @@ class Braintree::CLI
     end
     banner ||= main_parser.to_s
 
-    # TODO: Parse into objects??
-    if !input_io.tty?
-      ARGF.each_line do |line|
-        human_io.puts "LINE: #{line}"
-        object_ids << line.split(ENV.fetch("FS", " "))[0]
-      end
-    end
-
     Log.debug { "command selected: #{command}" }
     Log.debug { "with options: #{options}" }
     Log.debug { "with ids: #{object_ids}" }
@@ -171,6 +221,16 @@ class Braintree::CLI
       exit
     when Command::Error
       exit 1
+    when Command::FileRead
+      FileReadCommand.run(self)
+    when Command::FileWrite
+      FileWriteCommand.run(self)
+    when Command::FileDelete
+      FileDeleteCommand.run(self)
+    when Command::FileList
+      FileListCommand.run(self)
+    when Command::FilePurge
+      FilePurgeCommand.run(self)
     when Command::TransactionFind
       TransactionFindCommand.run(self)
     when Command::DisputeAccept
@@ -197,6 +257,18 @@ class Braintree::CLI
 
   def color?
     error.tty?
+  end
+
+  def input_tty?
+    input_io.tty?
+  end
+
+  def human_tty?
+    human_io.tty?
+  end
+
+  def data_tty?
+    data_io.tty?
   end
 end
 
