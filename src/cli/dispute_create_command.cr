@@ -23,7 +23,11 @@ class Braintree::CLI::DisputeCreateCommand
     end
 
     if success
-      disputes.human_view(cli.human_io)
+      unless cli.data_io.tty?
+        disputes.machine_view(cli.data_io)
+      else
+        disputes.human_view(cli.human_io)
+      end
       exit
     else
       cli.human_io.puts "Failed to create dispute with options #{cli.options}"

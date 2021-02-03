@@ -169,7 +169,7 @@ class Braintree::Models::Transaction
     end
   end
 
-  def output_fields
+  def output_fields(expanded = false)
     [
       id,
       status,
@@ -177,38 +177,40 @@ class Braintree::Models::Transaction
       amount,
       currency_iso_code,
       merchant_account_id,
-      refund_id ? refund_id : "N/A",
-      gateway_rejection_reason ? gateway_rejection_reason : "N/A",
+      refund_id ? refund_id.not_nil! : "N/A",
+      gateway_rejection_reason ? gateway_rejection_reason.not_nil! : "N/A",
       processor_response_code,
-      plan_id ? plan_id : "N/A",
-      subscription_id ? subscription_id : "N/A",
-      recurring
+      plan_id ? plan_id.not_nil! : "N/A",
+      subscription_id ? subscription_id.not_nil! : "N/A",
+      recurring.to_s
     ]
   end
 
-  def human_view(io = STDERR)
-    data = [ output_fields ]
+  def human_view(io = STDERR, expanded = false)
+    data = [ output_fields(expanded) ]
 
-    table = Tablo::Table.new(data) do |t|
-      t.add_column("ID", width: 8) { |n| n[0]}
-      t.add_column("Status", width: 7) { |n| n[1]}
-      t.add_column("Type", width: 4) { |n| n[2]}
-      t.add_column("Amount", width: 6) { |n| n[4]}
-      t.add_column("Currency ISO") { |n| n[3]}
-      t.add_column("Merchant Account ID", width: 19) { |n| n[5]}
-      t.add_column("Refund ID") { |n| n[6]}
-      t.add_column("Gateway Rejection Reason", width: 24) { |n| n[7]}
-      t.add_column("Processor Response Code", width: 23) { |n| n[8]}
-      t.add_column("Plan ID", width: 8) { |n| n[9]}
-      t.add_column("Subscription ID", width: 15) { |n| n[10]}
-      t.add_column("Recurring") { |n| n[11]}
-    end
+    view = Tablo::Table.new(data){ |table| human_view_columns(table) }
 
-    io.puts table
+    io.puts view
   end
 
-  def machine_view(io = STDOUT)
-    io.puts output_fields.map(&.to_s).join(" ")
+  def human_view_columns(table, prefix : String = "")
+    table.add_column("#{prefix}ID", width: 8 + prefix.size) { |n| n[0]}
+    table.add_column("#{prefix}Status", width: 7 + prefix.size) { |n| n[1]}
+    table.add_column("#{prefix}Type", width: 4 + prefix.size) { |n| n[2]}
+    table.add_column("#{prefix}Amount", width: 6 + prefix.size) { |n| n[4]}
+    table.add_column("#{prefix}Currency ISO", width: 12 + prefix.size) { |n| n[3]}
+    table.add_column("#{prefix}Merchant Account ID", width: 19 + prefix.size) { |n| n[5]}
+    table.add_column("#{prefix}Refund ID", width: 12 + prefix.size) { |n| n[6]}
+    table.add_column("#{prefix}Gateway Rejection Reason", width: 24 + prefix.size) { |n| n[7]}
+    table.add_column("#{prefix}Processor Response Code", width: 23 + prefix.size) { |n| n[8]}
+    table.add_column("#{prefix}Plan ID", width: 8 + prefix.size) { |n| n[9]}
+    table.add_column("#{prefix}Subscription ID", width: 15 + prefix.size) { |n| n[10]}
+    table.add_column("#{prefix}Recurring", width: 12 + prefix.size) { |n| n[11]}
+  end
+
+  def machine_view(io = STDOUT, expanded = false)
+    io.puts output_fields(expanded).map(&.to_s).join(" ")
   end
 
   def expand

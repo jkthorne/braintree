@@ -88,9 +88,9 @@ class Braintree::Models::Dispute
 
   getter xml : XML::Node?
   getter shallow_transaction : ShallowTransaction?
-  getter transaction : Transaction?
+  getter full_transaction : Transaction?
 
-  def initialize(@xml : XML::Node, @transaction : Transaction? = nil)
+  def initialize(@xml : XML::Node, @full_transaction : Transaction? = nil)
     @id = xml.xpath_node("./dispute/id").not_nil!.text
     @global_id = xml.xpath_node("./dispute/global-id").not_nil!.text
     @amount = xml.xpath_node("./dispute/amount").not_nil!.text
@@ -122,12 +122,25 @@ class Braintree::Models::Dispute
     end
   end
 
-  def expand
-    @transcation.try &.expand
+  def expand(source = "local")
+    return self if full_transaction
+    return self if shallow_transaction.nil?
+
+    BTQ::TransactionQuery.exec(shallow_transaction.not_nil!.id, source) do |op, tx|
+      @full_transaction = tx if tx
+    end
+
+    self
   end
 
   def store
-    File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
+    # File.write(Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s, @xml)
+
+    if raw_xml = xml
+      fragment = raw_xml.xpath_node(".")
+      puts fragment
+      File.write(Path["~/.config/bt/tmp_search.xml"].expand(home: true).to_s, fragment.to_s)
+    end
   end
 
   def self.load(id)
@@ -142,8 +155,8 @@ class Braintree::Models::Dispute
     end
   end
 
-  def output_fields
-    [
+  def output_fields(expanded = false)
+    fields = [
       id,
       amount,
       amount_disputed,
@@ -151,40 +164,54 @@ class Braintree::Models::Dispute
       case_number,
       currency_iso_code,
       date_opened.to_s("%F"),
-      date_won ? date_won : "N/A",
+      date_won ? date_won.not_nil!.to_s("%F") : "N/A",
       kind,
       reason,
       reason_code,
       reply_by_date.to_s("%F"),
       status,
-      shallow_transaction.nil? ? "N/A" : shallow_transaction.not_nil!.id 
+      shallow_transaction.nil? ? "N/A" : shallow_transaction.not_nil!.id
     ]
+    fields.concat(@full_transaction.not_nil!.output_fields) if expanded && full_transaction
+    fields
   end
 
-  def human_view(io = STDERR)
+  def human_view(io = STDERR, expanded = false)
     data = [ output_fields ]
 
-    table = Tablo::Table.new(data) do |t|
-      t.add_column("ID", width: 16) { |n| n[0] }
-      t.add_column("Amount", width: 7) { |n| n[1] }
-      t.add_column("Amount Disputed", width: 15) { |n| n[2] }
-      t.add_column("Amount Won", width: 10) { |n| n[3] }
-      t.add_column("Case Number", width: 14) { |n| n[4] }
-      t.add_column("Code ISO", width: 8) { |n| n[5] }
-      t.add_column("Date Opened", width: 11) { |n| n[6] }
-      t.add_column("Date Won", width: 10) { |n| n[7] }
-      t.add_column("Kind") { |n| n[8] }
-      t.add_column("Reason", width: 6) { |n| n[9] }
-      t.add_column("Reason Code", width: 11) { |n| n[10] }
-      t.add_column("Reply By Date", width: 13) { |n| n[11] }
-      t.add_column("Status", width: 8) { |n| n[12] }
-      t.add_column("TX ID", width: 8) { |n| n[13] }
+    view = Tablo::Table.new(data) do |table|
+      human_view_columns(table)
+      full_transaction.not_nil!.human_view_columns(table, prefix: "TX ") if expand && full_transaction
     end
 
-    io.puts table
+    io.puts view
   end
 
-  def machine_view(io = STDOUT)
-    io.puts output_fields.map(&.to_s).join(" ")
+  def human_view_columns(table)
+    table.add_column("ID", width: 16) { |n| n[0] }
+    table.add_column("Amount", width: 7) { |n| n[1] }
+    table.add_column("Amount Disputed", width: 15) { |n| n[2] }
+    table.add_column("Amount Won", width: 10) { |n| n[3] }
+    table.add_column("Case Number", width: 14) { |n| n[4] }
+    table.add_column("Code ISO", width: 8) { |n| n[5] }
+    table.add_column("Date Opened", width: 11) { |n| n[6] }
+    table.add_column("Date Won", width: 10) { |n| n[7] }
+    table.add_column("Kind") { |n| n[8] }
+    table.add_column("Reason", width: 6) { |n| n[9] }
+    table.add_column("Reason Code", width: 11) { |n| n[10] }
+    table.add_column("Reply By Date", width: 13) { |n| n[11] }
+    table.add_column("Status", width: 8) { |n| n[12] }
+  end
+
+  def machine_view(io = STDOUT, expanded = false)
+    io.puts output_fields(expanded).map(&.to_s).join(" ")
+  end
+
+  def transaction
+    if @full_transaction
+      return full_transaction
+    else
+       @shallow_transaction
+    end
   end
 end

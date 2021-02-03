@@ -21,12 +21,15 @@ class Braintree::Models::Disputes
   end
 
   def store
-    File.write(Path["~/.config/bt/tmp_search.xml"].expand(home: true).to_s, @xml)
+    disputes.each &.store
   end
 
-  def self.load(id)
-    path = Path["~/.config/bt/#{id}.xml"].expand(home: true).to_s
-    new(XML.parse(File.read(path))) if File.exists?(path)
+  def self.load(ids)
+    disputes = new
+    ids.each do |id|
+      disputes << Dispute.load(id)
+    end
+    disputes
   end
 
   def human_view(io = STDERR)

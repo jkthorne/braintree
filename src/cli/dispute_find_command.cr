@@ -4,6 +4,7 @@ class Braintree::CLI::DisputeFindCommand
       if cli.options[:source]? == "local"
         dispute = BT::Models::Dispute.load(dispute_id)
         if dispute
+          dispute.expand if cli.options[:data]? == "expanded"
           render(dispute, cli)
           exit
         end
@@ -11,6 +12,7 @@ class Braintree::CLI::DisputeFindCommand
 
       BTQ::Dispute::Find.exec(dispute_id) do |op, dispute|
         if dispute
+          dispute.expand if cli.options[:data]? == "expanded"
           render(dispute, cli)
         else
           STDERR.puts "failed to find dispute"
@@ -24,10 +26,10 @@ class Braintree::CLI::DisputeFindCommand
 
   # TODO: extract render into common method
   def self.render(dispute, cli)
-    if cli.human_io.tty?
-      dispute.human_view(cli.human_io)
+    unless cli.data_io.tty?
+      dispute.machine_view(cli.data_io, expanded: cli.options[:data]? == "expanded")
     else
-      dispute.machine_view(cli.data_io)
+      dispute.human_view(cli.human_io, expanded: cli.options[:data]? == "expanded")
     end
   end
 end

@@ -73,6 +73,7 @@ class Braintree::CLI
         parser.separator("Global")
         parser.on("-l", "--local", "persist/use local data") { options[:source] = "local" }
         parser.on("-r", "--remote", "only use remote date") { options[:source] = "remote" }
+        parser.on("-X", "--expand", "show expanded information") { options[:data] = "expanded" }
         parser.separator("Actions")
         parser.on("-F", "--finalize", "finalizes the dispute") { command = Command::DisputeFinalize }
         parser.on("-A", "--accept", "accepts a dispute") { command = Command::DisputeAccept }

@@ -30,7 +30,6 @@ class Braintree::Operations::CreateTransaction < BTO::Operation
     )
 
     @response = response # assign operation access later
-    # # TODO: deserialize to objects
     yield self, response.success? ? BT::Models::Transaction.new(XML.parse(response.body)) : nil
   end
 end
