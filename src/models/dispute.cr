@@ -174,11 +174,11 @@ class Braintree::Models::Dispute
   end
 
   def human_view(io = STDERR, expanded = false)
-    data = [ output_fields ]
+    data = [ output_fields(expanded) ]
 
     view = Tablo::Table.new(data) do |table|
       human_view_columns(table)
-      full_transaction.not_nil!.human_view_columns(table, prefix: "TX ") if expand && full_transaction
+      full_transaction.not_nil!.human_view_columns(table, prefix: "TX ") if expanded && full_transaction
     end
 
     io.puts view
