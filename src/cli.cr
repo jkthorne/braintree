@@ -38,8 +38,6 @@ class Braintree::CLI
   getter human_io : IO
 
   def initialize(@input_io = STDIN, @data_io = STDOUT, @human_io = STDERR)
-    # TODO: implement status property on cli
-    BT.load_config!
   end
 
   def self.run
@@ -48,8 +46,9 @@ class Braintree::CLI
 
   def run
     banner = nil
-
     command = Command::Banner
+    profile = "default"
+
     main_parser = OptionParser.parse do |parser|
       parser.banner = "Usage: bt [command] [switches]"
       parser.on("-h", "--help", "Prints this dialog") {
@@ -59,6 +58,7 @@ class Braintree::CLI
       parser.on("-v", "--version", "Print version") { puts parser }
       parser.on("-d", "--debug", "show debugging information") { ::Log.setup(:debug) }
       parser.on("-s", "--silent", "do not show human readable output") { setup_null_output }
+      parser.on("-p", "--profile", "profile ") { |_p| profile = _p }
 
       parser.separator("Subcommands")
 
@@ -215,9 +215,12 @@ class Braintree::CLI
     end
     banner ||= main_parser.to_s
 
-    Log.debug { "command selected: #{command}" }
-    Log.debug { "with options: #{options}" }
-    Log.debug { "with ids: #{object_ids}" }
+    Log.debug { "profile: #{profile}" }
+    Log.debug { "command: #{command}" }
+    Log.debug { "options: #{options}" }
+    Log.debug { "object_ids: #{object_ids}" }
+
+    BT.load_config(profile)
     case command
     when Command::Banner
       STDERR.puts banner
@@ -233,7 +236,7 @@ class Braintree::CLI
     when Command::FileList
       FileListCommand.run(self)
     when Command::ConfigSetup
-      BT.setup_config!
+      BT.setup_config(profile)
     when Command::FilePurge
       FilePurgeCommand.run(self)
     when Command::TransactionFind

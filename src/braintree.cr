@@ -142,8 +142,8 @@ module Braintree
     end
   end
 
-  def self.setup_config!
-    path = (config_dir / "config.ini").expand(home: true)
+  def self.setup_config(profile = "default")
+    path = (config_dir / "#{profile}.ini").expand(home: true)
 
     Braintree.configure do |settings|
       print "Enter merchant id: "
@@ -158,8 +158,8 @@ module Braintree
     File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
   end
 
-  def self.load_config!
-    path = (config_dir / "config.ini").expand(home: true)
+  def self.load_config(profile = "default")
+    path = (config_dir / "#{profile}.ini").expand(home: true)
 
     if File.exists?(path.to_s)
       config = INI.parse(File.read(path.to_s))
@@ -169,7 +169,7 @@ module Braintree
         settings.private_key = config.dig("braintree", "private_key")
       end
     else
-      setup_config!
+      setup_config(profile)
     end
   end
 end
