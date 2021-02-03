@@ -23,6 +23,7 @@ class Braintree::CLI
     FileDelete
     FileList
     FilePurge
+    ConfigSetup
   end
 
   Log = ::Log.for("CLI")
@@ -90,7 +91,9 @@ class Braintree::CLI
         end
       end
 
-      parser.on("config", "Configurations subcommands") do
+      parser.on("config", "Configuration subcommands") do
+        parser.banner = "Usage: bt dispute create [switches]"
+        parser.on("setup", "initial setup of configuration") { command = Command::ConfigSetup }
       end
 
       parser.on("transaction", "Transaction subcommands") do
@@ -229,6 +232,8 @@ class Braintree::CLI
       FileDeleteCommand.run(self)
     when Command::FileList
       FileListCommand.run(self)
+    when Command::ConfigSetup
+      BT.setup_config!
     when Command::FilePurge
       FilePurgeCommand.run(self)
     when Command::TransactionFind

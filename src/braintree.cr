@@ -142,6 +142,22 @@ module Braintree
     end
   end
 
+  def self.setup_config!
+    path = (config_dir / "config.ini").expand(home: true)
+
+    Braintree.configure do |settings|
+      print "Enter merchant id: "
+      settings.merchant = gets.to_s
+      print "Enter public key: "
+      settings.public_key = gets.to_s
+      print "Enter private key: "
+      settings.private_key = gets.to_s
+    end
+
+    FileUtils.mkdir_p(path.parent.to_s)
+    File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
+  end
+
   def self.load_config!
     path = (config_dir / "config.ini").expand(home: true)
 
@@ -153,16 +169,7 @@ module Braintree
         settings.private_key = config.dig("braintree", "private_key")
       end
     else
-      Braintree.configure do |settings|
-        print "Enter merchant id: "
-        settings.merchant = gets.to_s
-        print "Enter public key: "
-        settings.public_key = gets.to_s
-        print "Enter private key: "
-        settings.private_key = gets.to_s
-      end
-      FileUtils.mkdir_p(path.parent.to_s)
-      File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
+      setup_config!
     end
   end
 end
