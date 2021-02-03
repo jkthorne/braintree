@@ -156,6 +156,8 @@ module Braintree
 
     FileUtils.mkdir_p(path.parent.to_s)
     File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
+
+    true
   end
 
   def self.load_config(profile = "default")
@@ -163,11 +165,14 @@ module Braintree
 
     if File.exists?(path.to_s)
       config = INI.parse(File.read(path.to_s))
+
       Braintree.configure do |settings|
         settings.merchant = config.dig("braintree", "merchant")
         settings.public_key = config.dig("braintree", "public_key")
         settings.private_key = config.dig("braintree", "private_key")
       end
+
+      true
     else
       setup_config(profile)
     end

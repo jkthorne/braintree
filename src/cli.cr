@@ -236,7 +236,11 @@ class Braintree::CLI
     when Command::FileList
       FileListCommand.run(self)
     when Command::ConfigSetup
-      BT.setup_config(profile)
+      if BT.setup_config(profile)
+        human_io.puts "Successfully configured bt".colorize(:green) if human_tty?
+      else
+        human_io.puts "Failed to configured bt".colorize(:red) if human_tty?
+      end
     when Command::FilePurge
       FilePurgeCommand.run(self)
     when Command::TransactionFind
