@@ -37,18 +37,3 @@ TODO: Write development instructions here
 ## Contributors
 
 - [your-name-here](https://github.com/your-github-user) - creator and maintainer
-
-./bin/bt dispute search -s open -a 100,200 | awk '$2>123.45' | ./bin/bt dispute -A
-
-# pp(
-#   GQL.client(
-#     uri: Braintree.graph_host,
-#     headers: {
-#       "Authorization" => Braintree.auth_token,
-#       "Braintree-Version" => "2019-01-01",
-#     },
-#     tls: false
-#   ).query { |q|
-#     q.ping
-#   }
-# )
