@@ -16,9 +16,6 @@ require "./models"
 require "./operations"
 require "./queries"
 
-# # TODO: remove for config file
-Dotenv.load ".env"
-
 module Braintree
   Habitat.create do
     setting host : URI = URI.parse("https://api.sandbox.braintreegateway.com:443/")
@@ -160,6 +157,22 @@ module Braintree
     true
   end
 
+  def self.load_env_file
+    if File.exists?(ENV_FILE)
+      Dotenv.load(ENV_FILE)
+
+      Braintree.configure do |settings|
+        settings.merchant = ENV.fetch("BT_MERCHANT")
+        settings.public_key = ENV.fetch("BT_PUBLIC_KEY")
+        settings.private_key = NEV.fetch("BT_PRIVATE_KEY")
+      end
+
+      true
+    else
+      false
+    end
+  end
+
   def self.load_config(profile = "default")
     path = (config_dir / "#{profile}.ini").expand(home: true)
 
@@ -175,6 +188,22 @@ module Braintree
       true
     else
       setup_config(profile)
+    end
+  end
+
+  def self.push_config(merchant = nil, public_key = nil, private_key = nil, profile = "default")
+    path = (config_dir / "#{profile}.ini").expand(home: true)
+
+    if File.exists?(path.to_s)
+      config = INI.parse(File.read(path.to_s))
+
+      Braintree.configure do |settings|
+        settings.merchant = merchant || settings.merchant
+        settings.public_key = public_key || settings.public_key
+        settings.private_key = private_key || settings.private_key
+      end
+
+      true
     end
   end
 end

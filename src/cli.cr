@@ -24,11 +24,14 @@ class Braintree::CLI
     FileList
     FilePurge
     ConfigSetup
+    ConfigShow
+    ConfigUpdate
   end
 
   Log = ::Log.for("CLI")
 
-  
+  private property profile = "default"
+  getter profile : String
   private property options = {} of Symbol => String
   getter options = {} of Symbol => String
   private property object_ids = [] of String
@@ -47,7 +50,6 @@ class Braintree::CLI
   def run
     banner = nil
     command = Command::Banner
-    profile = "default"
 
     main_parser = OptionParser.parse do |parser|
       parser.banner = "Usage: bt [command] [switches]"
@@ -94,6 +96,30 @@ class Braintree::CLI
       parser.on("config", "Configuration subcommands") do
         parser.banner = "Usage: bt dispute create [switches]"
         parser.on("setup", "initial setup of configuration") { command = Command::ConfigSetup }
+        parser.on("-m", "--show-merchant-id", "Show merchant id") {
+          command = Command::ConfigShow
+          options[:merchant] = "show"
+        }
+        parser.on("-M MID", "--merchant_id MID", "Set merchant id") { |_m|
+          command = Command::ConfigUpdate
+          options[:merchant] = _m
+        }
+        parser.on("-k", "--show-public_key", "Shows public key") {
+          command = Command::ConfigShow
+          options[:public_key] = "show"
+        }
+        parser.on("-K MID", "--public_key MID", "Set public key") { |_k|
+          command = Command::ConfigUpdate
+          options[:public_key] = _k
+        }
+        parser.on("-q", "--show_private_key", "Shows private key") {
+          command = Command::ConfigShow
+          options[:private_key] = "show"
+        }
+        parser.on("-Q MID", "--private_key MID", "Set private key") { |_k|
+          command = Command::ConfigUpdate
+          options[:private_key] = _k
+        }
       end
 
       parser.on("transaction", "Transaction subcommands") do
@@ -214,14 +240,16 @@ class Braintree::CLI
       end
     end
     banner ||= main_parser.to_s
+    BT.load_config(profile)
 
     Log.debug { "profile: #{profile}" }
     Log.debug { "command: #{command}" }
     Log.debug { "options: #{options}" }
     Log.debug { "object_ids: #{object_ids}" }
 
-    BT.load_config(profile)
     case command
+    when Command::None
+      exit
     when Command::Banner
       STDERR.puts banner
       exit
@@ -235,18 +263,18 @@ class Braintree::CLI
       FileDeleteCommand.run(self)
     when Command::FileList
       FileListCommand.run(self)
+    when Command::ConfigShow
+      Config::ShowCommand.run(self)
+    when Command::ConfigUpdate
+      Config::UpdateCommand.run(self)
     when Command::ConfigSetup
-      if BT.setup_config(profile)
-        human_io.puts "Successfully configured bt".colorize(:green) if human_tty?
-      else
-        human_io.puts "Failed to configured bt".colorize(:red) if human_tty?
-      end
+      BT.setup_config
     when Command::FilePurge
       FilePurgeCommand.run(self)
     when Command::TransactionFind
       TransactionFindCommand.run(self)
     when Command::DisputeAccept
-      DisputeAcceptCommand.run(object_ids)
+      DisputeAcceptCommand.run(self)
     when Command::DisputeEvidence
       DisputeEvidenceCommand.run(object_ids, options)
     when Command::DisputeCreate

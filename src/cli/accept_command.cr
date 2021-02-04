@@ -1,7 +1,8 @@
 class Braintree::CLI::DisputeAcceptCommand
-  def self.run(ids : Array(String))
+  def self.run(cli)
     success = true
-    ids.each do |dispute_id|
+
+    cli.object_ids.each do |dispute_id|
       BTO::Dispute::Accept.exec(dispute_id) do |op, obj|
         if obj
           STDERR.puts "dispute(#{dispute_id}) accepted"
@@ -11,6 +12,7 @@ class Braintree::CLI::DisputeAcceptCommand
         end
       end
     end
+
     exit success ? 0 : 1
   end
 end
