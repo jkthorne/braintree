@@ -16,6 +16,7 @@ class Braintree::Models::Disputes
     @page_size = xml.xpath_node("./disputes/page-size").not_nil!.text.to_i
     @total_items = xml.xpath_node("./disputes/total-items").not_nil!.text.to_i
     xml.xpath_nodes("./disputes/dispute").try &.each do |child|
+      puts child
       @disputes << Dispute.new(child.not_nil!)
     end
   end
