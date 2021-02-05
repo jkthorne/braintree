@@ -11,7 +11,10 @@ class Braintree::CLI::DisputeCreateCommand
         card_expiration: cli.options.fetch(:card_expiration, BT::Transaction::Sandbox::Card.valid_expiration)
       ).exec do |op, dispute|
         if dispute
-          dispute.store
+          text = op.try(&.response).try(&.body).not_nil!
+          puts text
+          puts XML.parse_html(text.to_s) # <<- works
+          puts XML.parse_html(text.to_s) # <<- breaks
           disputes << dispute
           cli.human_io.puts "Dispute(#{dispute.id}) Created with options #{cli.options}".colorize(:green)
         else
