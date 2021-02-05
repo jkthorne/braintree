@@ -210,7 +210,7 @@ module Braintree
     config["public_key"] = public_key || settings.public_key
     config["private_key"] = private_key || settings.private_key
 
-    File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
+    File.write(path.to_s, INI.build({"braintree" => config}))
 
     true
   end
