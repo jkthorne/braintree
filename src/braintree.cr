@@ -29,25 +29,23 @@ module Braintree
   end
 
   @@home_dir : Path?
+
   def self.config_dir
     @@home_dir ||= begin
-                     path = home_dir / ".config" / "bt"
-                     if !File.exists?(path)
-                      FileUtils.mkdir_p(path.to_s)
-                    end
-                    path
-                  end
+      path = home_dir / ".config" / "bt"
+      FileUtils.mkdir_p(path.to_s) if !File.exists?(path.to_s)
+      path
+    end
   end
 
   @@data_dir : Path?
+
   def self.data_dir
     @@data_dir ||= begin
-                    path = home_dir / ".local" / "share" / "bt"
-                    if !File.exists?(path)
-                      FileUtils.mkdir_p(path.to_s)
-                    end
-                    path
-                  end
+      path = home_dir / ".local" / "share" / "bt"
+      FileUtils.mkdir_p(path.to_s) if !File.exists?(path.to_s)
+      path
+    end
   end
 
   @@graph_host : URI?
@@ -67,6 +65,7 @@ module Braintree
   end
 
   @@auth_token : String?
+
   def self.auth_token
     @@auth_toket ||= Base64.strict_encode(settings.public_key + ':' + settings.private_key)
   end
