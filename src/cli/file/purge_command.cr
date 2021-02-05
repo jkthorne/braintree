@@ -1,7 +1,7 @@
 class Braintree::CLI::FilePurgeCommand
   def self.run(cli)
-    Dir.new(BT.data_dir).each do |child|
-      File.delete(child)
+    Dir.children(BT.data_dir).each do |child|
+      File.delete(BT.data_dir / child)
       Log.debug { "Successfully deleted File(#{child})" }
     end
 
