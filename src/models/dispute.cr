@@ -167,14 +167,14 @@ class Braintree::Models::Dispute
       reason_code,
       reply_by_date.to_s("%F"),
       status,
-      shallow_transaction.nil? ? "N/A" : shallow_transaction.not_nil!.id
+      shallow_transaction.nil? ? "N/A" : shallow_transaction.not_nil!.id,
     ]
     fields.concat(@full_transaction.not_nil!.output_fields) if expanded && full_transaction
     fields
   end
 
   def human_view(io = STDERR, expanded = false)
-    data = [ output_fields(expanded) ]
+    data = [output_fields(expanded)]
 
     view = Tablo::Table.new(data) do |table|
       human_view_columns(table)
@@ -208,7 +208,7 @@ class Braintree::Models::Dispute
     if @full_transaction
       return full_transaction
     else
-       @shallow_transaction
+      @shallow_transaction
     end
   end
 end

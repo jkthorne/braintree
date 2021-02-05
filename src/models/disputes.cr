@@ -15,8 +15,8 @@ class Braintree::Models::Disputes
     @current_page_number = xml.xpath_node("./disputes/current-page-number").not_nil!.text.to_i
     @page_size = xml.xpath_node("./disputes/page-size").not_nil!.text.to_i
     @total_items = xml.xpath_node("./disputes/total-items").not_nil!.text.to_i
-    xml.xpath_nodes("./disputes").try &.each do |child|
-      @disputes << Dispute.new(child)
+    xml.xpath_nodes("./disputes/dispute").try &.each do |child|
+      @disputes << Dispute.new(child.not_nil!)
     end
   end
 

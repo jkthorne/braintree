@@ -2,6 +2,7 @@ class Braintree::Queries::Dispute::Search < BTQ::Query
   private getter options : Hash(Symbol, String)
 
   def initialize(@options)
+    # TODO: validate and split out cli options
     # TODO: build page info
   end
 
