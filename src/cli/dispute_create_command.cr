@@ -14,7 +14,7 @@ class Braintree::CLI::DisputeCreateCommand
           text = op.try(&.response).try(&.body).not_nil!
           puts text
           puts XML.parse_html(text.to_s) # <<- works
-          puts XML.parse_html(text.to_s) # <<- breaks
+          puts XML.parse(text.to_s) # <<- breaks
           disputes << dispute
           cli.human_io.puts "Dispute(#{dispute.id}) Created with options #{cli.options}".colorize(:green)
         else
