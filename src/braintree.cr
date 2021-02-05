@@ -205,17 +205,13 @@ module Braintree
   def self.push_config(merchant = nil, public_key = nil, private_key = nil, profile = "default")
     path = (config_dir / "#{profile}.ini").expand(home: true)
 
-    if File.exists?(path.to_s)
-      config = INI.parse(File.read(path.to_s))
-
-      Braintree.configure do |settings|
-        settings.merchant = merchant || settings.merchant
-        settings.public_key = public_key || settings.public_key
-        settings.private_key = private_key || settings.private_key
-      end
-
-      true
+    Braintree.configure do |settings|
+      settings.merchant = merchant || settings.merchant
+      settings.public_key = public_key || settings.public_key
+      settings.private_key = private_key || settings.private_key
     end
+
+    true
   end
 end
 
