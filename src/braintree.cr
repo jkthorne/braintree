@@ -7,7 +7,7 @@ require "csv"
 require "habitat"
 require "dotenv"
 require "gql"
-require "factory" # # TODO: remove
+require "factory" # TODO: remove
 require "tablo"
 
 require "./constants"
@@ -28,12 +28,26 @@ module Braintree
     Path.home
   end
 
+  @@home_dir : Path?
   def self.config_dir
-    home_dir / ".config" / "bt"
+    @@home_dir ||= begin
+                     path = home_dir / ".config" / "bt"
+                     if !File.exists?(path)
+                      FileUtils.mkdir_p(path.to_s)
+                    end
+                    path
+                  end
   end
 
+  @@data_dir : Path?
   def self.data_dir
-    home_dir / ".local" / "share" / "bt"
+    @@data_dir ||= begin
+                    path = home_dir / ".local" / "share" / "bt"
+                    if !File.exists?(path)
+                      FileUtils.mkdir_p(path.to_s)
+                    end
+                    path
+                  end
   end
 
   @@graph_host : URI?
@@ -53,7 +67,6 @@ module Braintree
   end
 
   @@auth_token : String?
-
   def self.auth_token
     @@auth_toket ||= Base64.strict_encode(settings.public_key + ':' + settings.private_key)
   end
@@ -151,7 +164,6 @@ module Braintree
       settings.private_key = gets.to_s
     end
 
-    FileUtils.mkdir_p(path.parent.to_s)
     File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
 
     true
