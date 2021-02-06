@@ -47,14 +47,14 @@ class Braintree::Models::Dispute
     getter payment_instrument_subtype : String
 
     def initialize(xml : XML::Node)
-      @id = xml.xpath_node("id").not_nil!.text
-      @global_id = xml.xpath_node("global-id").not_nil!.text
-      @amount = xml.xpath_node("amount").not_nil!.text
-      @created_at = xml.xpath_node("created-at").not_nil!.text
-      @installment_count = xml.xpath_node("installment-count").try &.text
-      @order_id = xml.xpath_node("order-id").try &.text
-      @purchase_order_number = xml.xpath_node("purchase-order-number").try &.text
-      @payment_instrument_subtype = xml.xpath_node("payment-instrument-subtype").not_nil!.text
+      @id = xml.xpath_string("string(id[text()])")
+      @global_id = xml.xpath_string("string(global-id[text()])")
+      @amount = xml.xpath_string("string(amount[text()])")
+      @created_at = xml.xpath_string("string(created-at[text()])")
+      @installment_count = xml.xpath_string("string(installment-count[text])")
+      @order_id = xml.xpath_string("string(order-id[text()])")
+      @purchase_order_number = xml.xpath_string("string(purchase-order-number[text()])")
+      @payment_instrument_subtype = xml.xpath_string("string(payment-instrument-subtype[text()])")
     end
   end
 
@@ -91,31 +91,31 @@ class Braintree::Models::Dispute
   getter full_transaction : Transaction?
 
   def initialize(@xml : XML::Node, @full_transaction : Transaction? = nil)
-    @id = xml.xpath_node("id").not_nil!.text
-    @global_id = xml.xpath_node("global-id").not_nil!.text
-    @amount = xml.xpath_node("amount").not_nil!.text
-    @amount_disputed = xml.xpath_node("amount-disputed").not_nil!.text
-    @amount_won = xml.xpath_node("amount-won").not_nil!.text
-    @case_number = xml.xpath_node("case-number").not_nil!.text
-    @created_at = Time.parse_iso8601 xml.xpath_node("created-at").not_nil!.text
-    @currency_iso_code = xml.xpath_node("currency-iso-code").not_nil!.text
-    @date_opened = Time.parse(xml.xpath_node("date-opened").not_nil!.text, "%F", Time::Location::UTC)
-    date_won = xml.xpath_node("date-won")
-    @date_won = Time.parse(date_won.not_nil!.text, "%F", Time::Location::UTC) unless date_won.try &.text.empty?
-    @processor_comments = xml.xpath_node("processor-comments").not_nil!.text
-    @kind = xml.xpath_node("kind").not_nil!.text
-    @merchant_account_id = xml.xpath_node("merchant-account-id").not_nil!.text
-    @reason = xml.xpath_node("reason").not_nil!.text
-    @reason_code = xml.xpath_node("reason-code").not_nil!.text.to_i
-    @reason_description = xml.xpath_node("reason-description").not_nil!.text
-    @received_date = Time.parse(xml.xpath_node("received-date").not_nil!.text, "%F", Time::Location::UTC)
-    @reference_number = xml.xpath_node("reference-number").not_nil!.text
-    @reply_by_date = Time.parse(xml.xpath_node("reply-by-date").not_nil!.text, "%F", Time::Location::UTC)
-    @processor_reply_by_date = Time.parse(xml.xpath_node("processor-reply-by-date").not_nil!.text, "%F", Time::Location::UTC)
-    @response_deadline = Time.parse_iso8601 xml.xpath_node("response-deadline").not_nil!.text
-    @status = xml.xpath_node("status").not_nil!.text
-    @updated_at = Time.parse_iso8601 xml.xpath_node("updated-at").not_nil!.text
-    @original_dispute_id = xml.xpath_node("original-dispute-id").not_nil!.text
+    @id = xml.xpath_string("string(id[text()])")
+    @global_id = xml.xpath_string("string(global-id[text()])")
+    @amount = xml.xpath_string("string(amount[text()])")
+    @amount_disputed = xml.xpath_string("string(amount-disputed[text()])")
+    @amount_won = xml.xpath_string("string(amount-won[text()])")
+    @case_number = xml.xpath_string("string(case-number[text()])")
+    @created_at = Time.parse_iso8601 xml.xpath_string("string(created-at[text()])")
+    @currency_iso_code = xml.xpath_string("string(currency-iso-code[text()])")
+    @date_opened = Time.parse(xml.xpath_string("string(date-opened[text()])"), "%F", Time::Location::UTC)
+    date_won = xml.xpath_string("string(date-won[text()])")
+    @date_won = Time.parse(date_won, "%F", Time::Location::UTC) unless date_won.empty?
+    @processor_comments = xml.xpath_string("string(processor-comments[text()])")
+    @kind = xml.xpath_string("string(kind[text()])")
+    @merchant_account_id = xml.xpath_string("string(merchant-account-id[text()])")
+    @reason = xml.xpath_string("string(reason[text()])")
+    @reason_code = xml.xpath_string("string(reason-code[text()])").to_i
+    @reason_description = xml.xpath_string("string(reason-description[text()])")
+    @received_date = Time.parse(xml.xpath_string("string(received-date[text()])"), "%F", Time::Location::UTC)
+    @reference_number = xml.xpath_string("string(reference-number[text()])")
+    @reply_by_date = Time.parse(xml.xpath_string("string(reply-by-date[text()])"), "%F", Time::Location::UTC)
+    @processor_reply_by_date = Time.parse(xml.xpath_string("string(processor-reply-by-date[text()])"), "%F", Time::Location::UTC)
+    @response_deadline = Time.parse_iso8601 xml.xpath_string("string(response-deadline[text()])")
+    @status = xml.xpath_string("string(status[text()])")
+    @updated_at = Time.parse_iso8601 xml.xpath_string("string(updated-at[text()])")
+    @original_dispute_id = xml.xpath_string("string(original-dispute-id[text()])")
 
     if transaction_node = xml.xpath_node("transaction")
       @shallow_transaction = ShallowTransaction.new(transaction_node)
