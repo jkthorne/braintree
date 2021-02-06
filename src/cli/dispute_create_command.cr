@@ -16,7 +16,11 @@ class Braintree::CLI::DisputeCreateCommand
           cli.human_io.puts "Dispute(#{dispute.id}) Created with options #{cli.options}".colorize(:green)
         else
           success = false
-          cli.human_io.puts "Server status #{op.try &.response.try &.status}".colorize(:red) if op.try &.response.try &.status
+          if op.try &.response.try &.status
+            cli.human_io.puts(
+              "Failed to create Dispute options:#{cli.options} status:#{op.try &.response.try &.status}".colorize(:red)
+            )
+          end
           break
         end
       end
@@ -30,7 +34,6 @@ class Braintree::CLI::DisputeCreateCommand
       end
       exit
     else
-      cli.human_io.puts "Failed to create dispute with options #{cli.options}"
       exit 1
     end
   end

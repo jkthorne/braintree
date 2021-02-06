@@ -18,8 +18,11 @@ class Braintree::Queries::Dispute::Find < BTQ::Query
     response = Braintree.http.get("/merchants/#{BT.settings.merchant}/disputes/#{id}")
     Log.debug { "Dispute(#{id}) #{response.success? ? "Succesfully" : "Failed"} to fetch from remote" }
 
-    dispute = BT::Models::Dispute.new(XML.parse(response.body))
-    dispute.store
-    yield self, response.success? ? dispute : nil
+    xml = XML.parse(response.body).xpath_node("dispute")
+    if xml
+      dispute = BT::Models::Dispute.new(xml)
+      dispute.store
+    end
+    yield self, dispute ? dispute : nil
   end
 end

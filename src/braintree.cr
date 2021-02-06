@@ -83,8 +83,6 @@ module Braintree
     response = gql(query)
 
     if response.success?
-      puts response.body
-
       gql_object = Models::TransactionResult.from_json(response.body)
       opertion = Operation.new(response)
 

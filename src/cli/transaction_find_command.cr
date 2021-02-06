@@ -6,7 +6,7 @@ class Braintree::CLI::TransactionFindCommand
           render(transaction, cli)
           exit
         else
-          STDERR.puts "failed to find transaction"
+          cli.human_io.puts "failed to find transaction"
           exit 1
         end
       end

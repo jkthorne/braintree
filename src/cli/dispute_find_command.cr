@@ -10,12 +10,12 @@ class Braintree::CLI::DisputeFindCommand
         end
       end
 
-      BTQ::Dispute::Find.exec(dispute_id, cli.options.fetch("source", "local")) do |op, dispute|
+      BTQ::Dispute::Find.exec(dispute_id, cli.options.fetch(:source, "local")) do |op, dispute|
         if dispute
           dispute.expand if cli.options[:data]? == "expanded"
           render(dispute, cli)
         else
-          STDERR.puts "failed to find dispute"
+          cli.human_io.puts "failed to find dispute"
           exit 1
         end
       end

@@ -5,10 +5,10 @@ class Braintree::CLI::DisputeAcceptCommand
     cli.object_ids.each do |dispute_id|
       BTO::Dispute::Accept.exec(dispute_id) do |op, obj|
         if obj
-          STDERR.puts "dispute(#{dispute_id}) accepted"
+          cli.human_io.puts "dispute(#{dispute_id}) accepted"
         else
           success = false
-          STDERR.puts "failed to accept dispute"
+          cli.human_io.puts "failed to accept dispute"
         end
       end
     end

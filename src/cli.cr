@@ -57,7 +57,7 @@ class Braintree::CLI
         command = Command::Banner
         banner = parser.to_s
       }
-      parser.on("-v", "--version", "Print version") { puts Braintree::VERSION }
+      parser.on("-v", "--version", "Print version") { human_io.puts Braintree::VERSION }
       parser.on("-d", "--debug", "show debugging information") { ::Log.setup(:debug) }
       parser.on("-s", "--silent", "do not show human readable output") { setup_null_output }
       parser.on("-p", "--profile", "profile ") { |_p| profile = _p }
@@ -251,7 +251,7 @@ class Braintree::CLI
     when Command::None
       exit
     when Command::Banner
-      STDERR.puts banner
+      human_io.puts banner
       exit
     when Command::Error
       exit 1
@@ -276,11 +276,11 @@ class Braintree::CLI
     when Command::DisputeAccept
       DisputeAcceptCommand.run(self)
     when Command::DisputeEvidence
-      DisputeEvidenceCommand.run(object_ids, options)
+      DisputeEvidenceCommand.run(self)
     when Command::DisputeCreate
       DisputeCreateCommand.run(self)
     when Command::DisputeFinalize
-      DisputeFinalizeCommand.run(object_ids)
+      DisputeFinalizeCommand.run(self)
     when Command::DisputeFind
       DisputeFindCommand.run(self)
     when Command::DisputeSearch

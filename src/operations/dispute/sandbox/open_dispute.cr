@@ -14,7 +14,13 @@ class Braintree::Operations::Dispute::Sandbox::OpenDispute < BTO::Operation
 
   def exec
     CreateTransaction.new(@amount, @card_number, @card_expiration).exec do |op, tx|
-      yield op, tx.try(&.disputes.first)
+      disputes = tx.try(&.disputes)
+      dispute_count = disputes.try(&.size)
+      if 0 < (dispute_count || 0)
+        yield op, disputes.not_nil!.first
+      else
+        yield op, nil
+      end
     end
   end
 end

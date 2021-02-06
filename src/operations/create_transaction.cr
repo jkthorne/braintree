@@ -30,6 +30,7 @@ class Braintree::Operations::CreateTransaction < BTO::Operation
     )
 
     @response = response # assign operation access later
-    yield self, response.success? ? BT::Models::Transaction.new(XML.parse(response.body)) : nil
+    xml = XML.parse(response.body).xpath_node("./transaction")
+    yield self, xml ? BT::Models::Transaction.new(xml) : nil
   end
 end
