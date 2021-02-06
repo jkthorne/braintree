@@ -57,7 +57,10 @@ class Braintree::CLI
         command = Command::Banner
         banner = parser.to_s
       }
-      parser.on("-v", "--version", "Print version") { human_io.puts Braintree::VERSION }
+      parser.on("-v", "--version", "Print version") do
+        command = Command::None
+        human_io.puts Braintree::VERSION
+      end
       parser.on("-d", "--debug", "show debugging information") { ::Log.setup(:debug) }
       parser.on("-s", "--silent", "do not show human readable output") { setup_null_output }
       parser.on("-p", "--profile", "profile ") { |_p| profile = _p }
