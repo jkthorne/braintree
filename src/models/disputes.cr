@@ -17,10 +17,8 @@ class Braintree::Models::Disputes
     @total_items = xml.xpath_node("disputes/total-items").not_nil!.text.to_i
 
     disputes_xml = xml.xpath_nodes("disputes//dispute")
-    # File.write "tmp.xml", disputes_xml
     if disputes_xml
       disputes_xml.each do |child|
-        # File.write "tmp.xml", child
         @disputes << Dispute.new(child)
       end
     end
