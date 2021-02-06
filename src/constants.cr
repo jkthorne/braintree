@@ -1,5 +1,5 @@
 module Braintree
-  VERSION = "0.4"
+  VERSION = "0.5"
 
   ENV_FILE = ".env"
 end
