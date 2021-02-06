@@ -57,7 +57,7 @@ class Braintree::CLI
         command = Command::Banner
         banner = parser.to_s
       }
-      parser.on("-v", "--version", "Print version") do
+      parser.on("--version", "Print version") do
         command = Command::None
         human_io.puts Braintree::VERSION
       end
