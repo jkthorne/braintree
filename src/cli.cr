@@ -53,10 +53,7 @@ class Braintree::CLI
 
     main_parser = OptionParser.parse do |parser|
       parser.banner = "Usage: bt [command] [switches]"
-      parser.on("-h", "--help", "Prints this dialog") {
-        command = Command::Banner
-        banner = parser.to_s
-      }
+      parser.on("-h", "--help", "Prints this dialog") { banner = parser.to_s }
       parser.on("--version", "Print version") do
         command = Command::None
         human_io.puts Braintree::VERSION
@@ -243,7 +240,6 @@ class Braintree::CLI
       end
     end
     banner ||= main_parser.to_s
-    BT.load_config(profile)
 
     Log.debug { "profile: #{profile}" }
     Log.debug { "command: #{command}" }
@@ -275,18 +271,25 @@ class Braintree::CLI
     when Command::FilePurge
       FilePurgeCommand.run(self)
     when Command::TransactionFind
+      BT.load_config(profile)
       TransactionFindCommand.run(self)
     when Command::DisputeAccept
+      BT.load_config(profile)
       DisputeAcceptCommand.run(self)
     when Command::DisputeEvidence
+      BT.load_config(profile)
       DisputeEvidenceCommand.run(self)
     when Command::DisputeCreate
+      BT.load_config(profile)
       DisputeCreateCommand.run(self)
     when Command::DisputeFinalize
+      BT.load_config(profile)
       DisputeFinalizeCommand.run(self)
     when Command::DisputeFind
+      BT.load_config(profile)
       DisputeFindCommand.run(self)
     when Command::DisputeSearch
+      BT.load_config(profile)
       DisputeSearchCommand.run(self)
     else
       human_io.puts "ERROR: you found an error in the CLI please consider submitting an issue"
