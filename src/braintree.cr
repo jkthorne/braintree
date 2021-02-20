@@ -4,10 +4,7 @@ require "json"
 require "xml"
 require "csv"
 
-require "habitat" # TODO: remove
-require "dotenv" # TODO: remove
 require "gql"
-require "factory" # TODO: remove
 require "tablo"
 
 require "./config"

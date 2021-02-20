@@ -119,14 +119,12 @@ class Braintree::Queries::Dispute::Search < BTQ::Query
 
   private def kind_params(xml)
     if options[:kind]?
-      kinds = options[:kind].split(",")
-      kinds.each do |k|
-        raise "invalid kind #{k}" unless BT::Models::Dispute::Kind::ALL.includes?(k)
+      xml.element("kind", type: "array") do
+        options[:kind].split(",").each do |kind|
+          raise "invalid kind #{kind}" unless BT::Models::Dispute::Kind::ALL.includes?(kind)
+          xml.element("item") { xml.text kind }
+        end
       end
-
-      xml.element("kind", type: "array") {
-        kinds.each { |kind| xml.element("item") { xml.text kind } }
-      }
     end
   end
 
@@ -140,14 +138,12 @@ class Braintree::Queries::Dispute::Search < BTQ::Query
 
   private def reason_params(xml)
     if options[:reason]?
-      reasons = options[:reason].split(",")
-      reasons.each do |k|
-        raise "invalid reason #{k}" unless BT::Models::Dispute::Reason::ALL.includes?(k)
+      xml.element("reason", type: "array") do
+        options[:reason].split(",").each do |reason|
+          raise "invalid reason #{reason}" unless BT::Models::Dispute::Reason::ALL.includes?(reason)
+          xml.element("item") { xml.text reason }
+        end
       end
-
-      xml.element("reason", type: "array") {
-        reasons.each { |reason| xml.element("item") { xml.text reason } }
-      }
     end
   end
 
@@ -203,27 +199,23 @@ class Braintree::Queries::Dispute::Search < BTQ::Query
 
   private def status_params(xml)
     if options[:status]?
-      statuses = options[:status].split(",")
-      statuses.each do |s|
-        raise "invalid status #{s}" unless BT::Models::Dispute::Status::ALL.includes?(s)
+      xml.element("status", type: "array") do
+        options[:status].split(",").each do |status|
+          raise "invalid status #{status}" unless BT::Models::Dispute::Status::ALL.includes?(status)
+          xml.element("item") { xml.text status }
+        end
       end
-
-      xml.element("status", type: "array") {
-        statuses.each { |status| xml.element("item") { xml.text status } }
-      }
     end
   end
 
   private def transaction_source_params(xml)
     if options[:transaction_source]?
-      sources = options[:transaction_source].split(",")
-      sources.each do |s|
-        raise "invalid source #{s}" unless BT::Models::Dispute::TransactionSource::ALL.includes?(s)
+      xml.element("source", type: "array") do
+        options[:transaction_source].split(",").each do |source|
+          raise "invalid source #{source}" unless BT::Models::Dispute::TransactionSource::ALL.includes?(source)
+          xml.element("item") { xml.text source }
+        end
       end
-
-      xml.element("source", type: "array") {
-        sources.each { |source| xml.element("item") { xml.text source } }
-      }
     end
   end
 end

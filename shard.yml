@@ -13,13 +13,9 @@ crystal: 0.35.1
 license: MIT
 
 dependencies:
-  habitat:
-    github: luckyframework/habitat
-  dotenv:
-    github: gdotdesign/cr-dotenv
   gql:
     github: wontruefree/gql
-  factory:
-    github: imdrasil/factory
+    version: ~> 0.1.0
   tablo:
     github: hutou/tablo
+    version: ~> 0.9.5
