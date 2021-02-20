@@ -1,13 +1,20 @@
 class Braintree::CLI::Config::UpdateCommand
   def self.run(cli)
-    success = BT.push_config(cli.options[:merchant]?, cli.options[:public_id]?, cli.options[:private_key]?, cli.profile)
+    config = BT::Config.new(
+      profile: cli.profile,
+      enviroment: cli.options[:enviroment]?,
+      merchant: cli.options[:merchant]?,
+      public_key: cli.options[:public_key]?,
+      private_key: cli.options[:private_key]?,
+      host: cli.options[:host]?
+    )
 
-    if success && cli.human_tty?
-      cli.human_io.puts "Successfully set #{cli.profile} profile public key"
+    if config.save && cli.human_tty?
+      cli.human_io.puts "Successfully updated Config(#{cli.profile})"
     elsif cli.human_tty?
-      cli.human_io.puts "Failed to set #{cli.profile} profile public key"
+      cli.human_io.puts "Failed to update Config(#{cli.profile})"
     end
 
-    exit success ? 0 : 1
+    exit
   end
 end

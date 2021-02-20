@@ -4,7 +4,7 @@ class Braintree::Operations::Dispute::Accept < BTO::Operation
   def initialize(@dispute_id)
     @request = HTTP::Request.new(
       method: "PUT",
-      resource: "/merchants/#{BT.settings.merchant}/disputes/#{dispute_id}/accept"
+      resource: "/merchants/#{BT.config.merchant}/disputes/#{dispute_id}/accept"
     )
   end
 

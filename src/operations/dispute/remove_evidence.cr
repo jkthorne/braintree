@@ -14,7 +14,7 @@ class Braintree::Operations::Dispute::RemoveEvidence < BTO::Operation
   def exec
     request = HTTP::Request.new(
       method: "DELETE",
-      resource: "/merchants/#{BT.settings.merchant}/disputes/#{dispute_id}/evidence/#{evidence_id}"
+      resource: "/merchants/#{BT.config.merchant}/disputes/#{dispute_id}/evidence/#{evidence_id}"
     )
 
     response = Braintree.http.exec(request)

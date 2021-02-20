@@ -15,7 +15,7 @@ class Braintree::Operations::Dispute::AddTextEvidence < BTO::Operation
     # # TODO: move to @request
     request = HTTP::Request.new(
       method: "POST",
-      resource: "/merchants/#{BT.settings.merchant}/disputes/#{dispute_id}/evidence",
+      resource: "/merchants/#{BT.config.merchant}/disputes/#{dispute_id}/evidence",
       body: Braintree.xml { |t|
         t.evidence {
           t.comments content

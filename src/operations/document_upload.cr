@@ -45,7 +45,7 @@ class Braintree::Operations::DocumentUpload < BTO::Operation
 
       headers = HTTP::Headers{"Content-Type" => channel.receive}
       response = Braintree.http.post(
-        path: "/merchants/#{BT.settings.merchant}/document_uploads",
+        path: "/merchants/#{BT.config.merchant}/document_uploads",
         body: reader,
         headers: headers
       )

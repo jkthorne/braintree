@@ -15,9 +15,9 @@ class Braintree::Queries::TransactionQuery < BTQ::Query
       end
     end
 
-    response = Braintree.http.get("/merchants/#{BT.settings.merchant}/transactions/#{id}")
+    response = Braintree.http.get("/merchants/#{BT.config.merchant}/transactions/#{id}")
     Log.debug { "Transaction(#{id}) #{response.success? ? "Succesfully" : "Failed"} to fetch from remote" }
-    
+
     if xml_node = XML.parse(response.body).xpath_node("./transaction")
       transaction = BT::Models::Transaction.new(xml_node)
       transaction.store

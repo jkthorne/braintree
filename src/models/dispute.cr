@@ -22,6 +22,12 @@ class Braintree::Models::Dispute
     ProductUnsatisfactory         = "product_unsatisfactory"
     TransactionAmountDiffers      = "transaction_amount_differs"
     Retrieval                     = "retrieval"
+
+    ALL = [
+      CancelledRecurringTransaction, CreditNotProcessed, Duplicate, Fraud,
+      General, InvalidAccount, NotRecognized, ProductNotReceived,
+      ProductUnsatisfactory, TransactionAmountDiffers, Retrieval,
+    ]
   end
 
   module Kind
@@ -30,6 +36,15 @@ class Braintree::Models::Dispute
     Retrieval      = "retrieval"
 
     ALL = [Chargeback, PreArbitration, Retrieval]
+  end
+
+  module TransactionSource
+    Api          = "api"
+    ControlPanel = "control_panel"
+    Recurring    = "recurring"
+    OAuth        = "oauth"
+
+    ALL = [Api, ControlPanel, Recurring, OAuth]
   end
 
   module CreditCard

@@ -15,7 +15,7 @@ class Braintree::Queries::Dispute::Find < BTQ::Query
       end
     end
 
-    response = Braintree.http.get("/merchants/#{BT.settings.merchant}/disputes/#{id}")
+    response = Braintree.http.get("/merchants/#{BT.config.merchant}/disputes/#{id}")
     Log.debug { "Dispute(#{id}) #{response.success? ? "Succesfully" : "Failed"} to fetch from remote" }
 
     xml = XML.parse(response.body).xpath_node("dispute")

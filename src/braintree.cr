@@ -4,12 +4,13 @@ require "json"
 require "xml"
 require "csv"
 
-require "habitat"
-require "dotenv"
+require "habitat" # TODO: remove
+require "dotenv" # TODO: remove
 require "gql"
 require "factory" # TODO: remove
 require "tablo"
 
+require "./config"
 require "./constants"
 require "./xml_builder"
 require "./models"
@@ -17,25 +18,16 @@ require "./operations"
 require "./queries"
 
 module Braintree
-  Habitat.create do
-    setting host : URI = URI.parse("https://api.sandbox.braintreegateway.com:443/")
-    setting public_key : String
-    setting private_key : String
-    setting merchant : String
-  end
+  @@config : BT::Config?
 
-  def self.home_dir
-    Path.home
+  def self.config(profile = "default")
+    @@config ||= Config.new(profile)
   end
 
   @@home_dir : Path?
 
-  def self.config_dir
-    @@home_dir ||= begin
-      path = home_dir / ".config" / "bt"
-      FileUtils.mkdir_p(path.to_s) if !File.exists?(path.to_s)
-      path
-    end
+  def self.home_dir
+    Path.home
   end
 
   @@data_dir : Path?
@@ -67,7 +59,7 @@ module Braintree
   @@auth_token : String?
 
   def self.auth_token
-    @@auth_toket ||= Base64.strict_encode(settings.public_key + ':' + settings.private_key)
+    @@auth_toket ||= Base64.strict_encode(config.public_key + ':' + config.private_key)
   end
 
   class Operation
@@ -127,7 +119,7 @@ module Braintree
 
   def self.http
     @@client ||= begin
-      client = HTTP::Client.new settings.host
+      client = HTTP::Client.new config.host
       client.before_request do |request|
         request.headers["Authorization"] = "Bearer #{Braintree.auth_token}"
         request.headers["x-apiversion"] = "6"
@@ -147,70 +139,6 @@ module Braintree
         yield tb
       end
     end
-  end
-
-  def self.setup_config(profile = "default")
-    path = (config_dir / "#{profile}.ini").expand(home: true)
-
-    Braintree.configure do |settings|
-      print "Enter merchant id: "
-      settings.merchant = gets.to_s
-      print "Enter public key: "
-      settings.public_key = gets.to_s
-      print "Enter private key: "
-      settings.private_key = gets.to_s
-    end
-
-    File.write(path.to_s, INI.build({"braintree" => Braintree.settings.to_h}))
-
-    true
-  end
-
-  def self.load_env_file
-    if File.exists?(ENV_FILE)
-      Dotenv.load(ENV_FILE)
-
-      Braintree.configure do |settings|
-        settings.merchant = ENV.fetch("BT_MERCHANT")
-        settings.public_key = ENV.fetch("BT_PUBLIC_KEY")
-        settings.private_key = NEV.fetch("BT_PRIVATE_KEY")
-      end
-
-      true
-    else
-      false
-    end
-  end
-
-  def self.load_config(profile = "default")
-    path = (config_dir / "#{profile}.ini").expand(home: true)
-
-    if File.exists?(path.to_s)
-      config = INI.parse(File.read(path.to_s))
-
-      Braintree.configure do |settings|
-        settings.merchant = config.dig("braintree", "merchant")
-        settings.public_key = config.dig("braintree", "public_key")
-        settings.private_key = config.dig("braintree", "private_key")
-      end
-
-      true
-    else
-      setup_config(profile)
-    end
-  end
-
-  def self.push_config(merchant = nil, public_key = nil, private_key = nil, profile = "default")
-    path = (config_dir / "#{profile}.ini").expand(home: true)
-    config = {} of String => String
-
-    config["merchant"] = merchant || settings.merchant
-    config["public_key"] = public_key || settings.public_key
-    config["private_key"] = private_key || settings.private_key
-
-    File.write(path.to_s, INI.build({"braintree" => config}))
-
-    true
   end
 end
 

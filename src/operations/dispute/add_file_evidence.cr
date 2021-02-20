@@ -15,7 +15,7 @@ class Braintree::Operations::Dispute::AddFileEvidence < BTO::Operation
   def exec
     request = HTTP::Request.new(
       method: "POST",
-      resource: "/merchants/#{BT.settings.merchant}/disputes/#{dispute_id}/evidence",
+      resource: "/merchants/#{BT.config.merchant}/disputes/#{dispute_id}/evidence",
       body: Braintree.xml { |t|
         t.evidence {
           t.document_upload_id document_id
