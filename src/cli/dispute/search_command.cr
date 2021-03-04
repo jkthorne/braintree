@@ -1,6 +1,6 @@
-class Braintree::CLI::DisputeSearchCommand
+class Braintree::CLI::Dispute::SearchCommand
   def self.run(cli)
-    BTQ::Dispute::Search.exec(cli.options) do |op, disputes|
+    Braintree::Dispute::Search.exec(cli.options) do |op, disputes|
       if disputes
         disputes.store
         render(disputes, cli)

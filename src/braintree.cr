@@ -59,45 +59,45 @@ module Braintree
     @@auth_toket ||= Base64.strict_encode(config.public_key + ':' + config.private_key)
   end
 
-  class Operation
-    getter http : HTTP::Client::Response
-    getter page_info : Models::PageInfo?
+  # class Operation
+  #   getter http : HTTP::Client::Response
+  #   getter page_info : Models::PageInfo?
 
-    def initialize(@http, @page_info = nil)
-    end
-  end
+  #   def initialize(@http, @page_info = nil)
+  #   end
+  # end
 
-  def self.charge(*args, **params)
-    query = Operations::ChargePaymentMethod.new(*args, **params)
-    response = gql(query)
+  # def self.charge(*args, **params)
+  #   query = Operations::ChargePaymentMethod.new(*args, **params)
+  #   response = gql(query)
 
-    if response.success?
-      gql_object = Models::TransactionResult.from_json(response.body)
-      opertion = Operation.new(response)
+  #   if response.success?
+  #     gql_object = Models::TransactionResult.from_json(response.body)
+  #     opertion = Operation.new(response)
 
-      yield opertion, gql_object.data.charge_payment_method.transaction
-    else
-      yield Operation.new(response), nil
-    end
-  end
+  #     yield opertion, gql_object.data.charge_payment_method.transaction
+  #   else
+  #     yield Operation.new(response), nil
+  #   end
+  # end
 
-  def self.transaction_search(*args, **params)
-    query = Operations::TransactionSearch.new(*args, **params)
-    response = gql(query)
+  # def self.transaction_search(*args, **params)
+  #   query = Operations::TransactionSearch.new(*args, **params)
+  #   response = gql(query)
 
-    if response.success?
-      gql_object = Models::TransactionSearchResult.from_json(response.body)
-      opertion = Operation.new(response, gql_object.data.search.transactions.page_info)
+  #   if response.success?
+  #     gql_object = Models::TransactionSearchResult.from_json(response.body)
+  #     opertion = Operation.new(response, gql_object.data.search.transactions.page_info)
 
-      model = gql_object.data.search.transactions.edges.map do |edge|
-        edge.node
-      end
+  #     model = gql_object.data.search.transactions.edges.map do |edge|
+  #       edge.node
+  #     end
 
-      yield opertion, model
-    else
-      yield Operation.new(response), nil
-    end
-  end
+  #     yield opertion, model
+  #   else
+  #     yield Operation.new(response), nil
+  #   end
+  # end
 
   def self.gql(query)
     HTTP::Client.post(

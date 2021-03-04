@@ -1,4 +1,4 @@
-class Braintree::Queries::Dispute::Find < BTQ::Query
+class Braintree::Dispute::Find < Braintree::Query
   private getter id : String
   private getter source : String # Extract into constant or enum
 

@@ -1,9 +1,9 @@
-class Braintree::CLI::DisputeAcceptCommand
+class Braintree::CLI::Dispute::AcceptCommand
   def self.run(cli)
     success = true
 
     cli.object_ids.each do |dispute_id|
-      BTO::Dispute::Accept.exec(dispute_id) do |op, obj|
+      Braintree::Dispute::Accept.exec(dispute_id) do |op, obj|
         if obj
           cli.human_io.puts "dispute(#{dispute_id}) accepted"
         else

@@ -1,4 +1,4 @@
-class Braintree::CLI::DisputeEvidenceCommand
+class Braintree::CLI::Dispute::EvidenceCommand
   def self.run(cli)
     unless cli.options.has_key?(:text) || cli.options.has_key?(:file) || cli.options.has_key?(:remove)
       cli.human_io.puts "Used the evidence command with invalid parameters"
@@ -21,7 +21,7 @@ class Braintree::CLI::DisputeEvidenceCommand
     success = true
 
     cli.object_ids.each do |dispute_id|
-      Braintree::Operations::Dispute::AddTextEvidence.exec(dispute_id, cli.options[:text]) do |op, evidence|
+      Braintree::Dispute::AddTextEvidence.exec(dispute_id, cli.options[:text]) do |op, evidence|
         if evidence
           evidence.store
           cli.human_io.puts "dispute(#{dispute_id}) now has evidence(#{evidence.id})"
@@ -39,11 +39,11 @@ class Braintree::CLI::DisputeEvidenceCommand
     success = true
 
     cli.object_ids.each do |dispute_id|
-      BTO::DocumentUpload.exec(dispute_id, cli.options[:file]) do |op, document|
+      Document::Upload.exec(dispute_id, cli.options[:file]) do |op, document|
         if document
           document.store
           cli.human_io.puts "Document(#{document.id}) successfully uploaded"
-          BTO::Dispute::AddFileEvidence.new(dispute_id, document.id).exec do |op, evidence|
+          Braintree::Dispute::AddFileEvidence.new(dispute_id, document.id).exec do |op, evidence|
             if evidence
               evidence.store
               cli.human_io.puts "Successfuly added Evidence(#{evidence.id}) to Dispute(#{dispute_id})"
@@ -66,7 +66,7 @@ class Braintree::CLI::DisputeEvidenceCommand
     success = true
 
     cli.object_ids.each do |dispute_id|
-      BTO::Dispute::RemoveEvidence.new(dispute_id, cli.options[:remove]).exec do |op, evidence|
+      Braintree::Dispute::RemoveEvidence.new(dispute_id, cli.options[:remove]).exec do |op, evidence|
         if evidence
           cli.human_io.puts "Successfuly removed Evidence(#{cli.options[:remove]}) to Dispute(#{dispute_id})"
         else

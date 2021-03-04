@@ -1,7 +1,7 @@
-class Braintree::CLI::TransactionFindCommand
+class Braintree::CLI::Transaction::FindCommand
   def self.run(cli)
     cli.object_ids.each do |transaction_id|
-      BTQ::TransactionQuery.exec(transaction_id, source: cli.options.fetch(:source, "remote")) do |op, transaction|
+      Braintree::Transaction::Find.exec(transaction_id, source: cli.options.fetch(:source, "remote")) do |op, transaction|
         if transaction
           render(transaction, cli)
           exit

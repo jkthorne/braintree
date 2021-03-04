@@ -1,10 +1,9 @@
-class Braintree::Operations::Dispute::Sandbox::WonDispute < BTO::Operation
+class Braintree::Dispute::WonDispute
   private getter amount : String
   private getter card_number : String
   private getter card_expiration : String
 
   def initialize(@amount, @card_number, @card_expiration)
-    # # TODO: add state managment (State)
   end
 
   def self.exec(*args, **kargs)
@@ -14,7 +13,7 @@ class Braintree::Operations::Dispute::Sandbox::WonDispute < BTO::Operation
   end
 
   def exec
-    CreateTransaction.new(@amount, @card_number, @card_expiration).exec do |op, tx|
+    Transaction::Create.new(@amount, @card_number, @card_expiration).exec do |op, tx|
       if op.success? && tx
         dispute = tx.disputes.first
         dispute_id = dispute.id

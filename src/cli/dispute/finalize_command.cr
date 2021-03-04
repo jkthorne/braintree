@@ -1,9 +1,9 @@
-class Braintree::CLI::DisputeFinalizeCommand
+class Braintree::CLI::Dispute::FinalizeCommand
   def self.run(cli)
     success = true
 
     cli.object_ids.each do |dispute_id|
-      BTO::Dispute::Finalize.exec(dispute_id) do |op, obj|
+      BT::Dispute::Finalize.exec(dispute_id) do |op, obj|
         if cli.human_tty? && obj
           cli.human_io.puts "Dispute(#{dispute_id}) finalized"
         else

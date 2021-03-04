@@ -287,19 +287,19 @@ class Braintree::CLI
     when Command::FilePurge
       FilePurgeCommand.run(self)
     when Command::TransactionFind
-      TransactionFindCommand.run(self)
+      Transaction::FindCommand.run(self)
     when Command::DisputeAccept
-      DisputeAcceptCommand.run(self)
+      Dispute::AcceptCommand.run(self)
     when Command::DisputeEvidence
-      DisputeEvidenceCommand.run(self)
+      Dispute::EvidenceCommand.run(self)
     when Command::DisputeCreate
-      DisputeCreateCommand.run(self)
+      Dispute::CreateCommand.run(self)
     when Command::DisputeFinalize
-      DisputeFinalizeCommand.run(self)
+      Dispute::FinalizeCommand.run(self)
     when Command::DisputeFind
-      DisputeFindCommand.run(self)
+      Dispute::FindCommand.run(self)
     when Command::DisputeSearch
-      DisputeSearchCommand.run(self)
+      Dispute::SearchCommand.run(self)
     else
       human_io.puts "ERROR: you found an error in the CLI please consider submitting an issue"
       exit 1

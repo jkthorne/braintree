@@ -1,4 +1,4 @@
-class Braintree::Operations::DocumentUpload < BTO::Operation
+class Braintree::Document::Upload
   getter dispute_id : String
   getter file_path : Path
 
@@ -8,12 +8,6 @@ class Braintree::Operations::DocumentUpload < BTO::Operation
       STDERR.puts "File for upload does not exist"
       exit 1
     end
-
-    # {"document_upload[kind]"=>"evidence_document"}
-    # @request = HTTP::Request.new(
-    #   method: "POST",
-    #   resource: "/merchants/#{dispute_id}/document_uploads"
-    # )
   end
 
   def self.exec(*args, **kargs)
@@ -51,7 +45,6 @@ class Braintree::Operations::DocumentUpload < BTO::Operation
       )
     end
 
-    @response = response
     yield self, response.not_nil!.success? ? Models::Document.new(XML.parse(response.not_nil!.body)) : nil
   end
 end

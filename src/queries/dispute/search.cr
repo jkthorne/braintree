@@ -1,4 +1,4 @@
-class Braintree::Queries::Dispute::Search < BTQ::Query
+class Braintree::Dispute::Search < Braintree::Query
   private getter options : Hash(Symbol, String)
 
   def initialize(@options)

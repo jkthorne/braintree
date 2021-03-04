@@ -1,4 +1,4 @@
-class Braintree::CLI::DisputeFindCommand
+class Braintree::CLI::Dispute::FindCommand
   def self.run(cli)
     cli.object_ids.each do |dispute_id|
       if cli.options[:source]? == "local"
@@ -10,7 +10,7 @@ class Braintree::CLI::DisputeFindCommand
         end
       end
 
-      BTQ::Dispute::Find.exec(dispute_id, cli.options.fetch(:source, "local")) do |op, dispute|
+      Braintree::Dispute::Find.exec(dispute_id, cli.options.fetch(:source, "local")) do |op, dispute|
         if dispute
           dispute.expand if cli.options[:data]? == "expanded"
           render(dispute, cli)

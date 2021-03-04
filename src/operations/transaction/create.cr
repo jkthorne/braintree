@@ -1,22 +1,15 @@
-class Braintree::Operations::CreateTransaction < BTO::Operation
+class Braintree::Transaction::Create < Braintree::Operation
   getter amount : String
   getter card_number : String
   getter card_expiration : String
   getter type : String
   getter response : HTTP::Client::Response?
 
+  # TODO: use transaction object
   def initialize(@amount, @card_number, @card_expiration, @type = "sale")
-  end
-
-  def self.exec(*args, **kargs)
-    new(*args, **kargs).exec do |op, tx|
-      yield op, tx
-    end
-  end
-
-  def exec
-    response = BT.http.post(
-      path: "/merchants/#{BT.config.merchant}/transactions",
+    @request = HTTP::Request.new(
+      method: "POST",
+      resource: "/merchants/#{BT.config.merchant}/transactions",
       body: BT.xml { |t|
         t.transaction {
           t.amount amount
@@ -28,8 +21,12 @@ class Braintree::Operations::CreateTransaction < BTO::Operation
         }
       }
     )
+  end
 
-    @response = response # assign operation access later
+  def exec
+    response = BT.http.exec(request)
+    @response = response
+
     xml = XML.parse(response.body).xpath_node("./transaction")
     yield self, xml ? BT::Models::Transaction.new(xml) : nil
   end

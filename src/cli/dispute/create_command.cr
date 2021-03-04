@@ -1,4 +1,4 @@
-class Braintree::CLI::DisputeCreateCommand
+class Braintree::CLI::Dispute::CreateCommand
   def self.resolve(klass, cli)
     success = true
     disputes = BT::Models::Disputes.new
@@ -45,9 +45,9 @@ class Braintree::CLI::DisputeCreateCommand
     end
 
     case cli.options.fetch(:status, "open")
-    when "open" then resolve(Braintree::Operations::Dispute::Sandbox::OpenDispute, cli)
-    when "won"  then resolve(Braintree::Operations::Dispute::Sandbox::WonDispute, cli)
-    when "lost" then resolve(Braintree::Operations::Dispute::Sandbox::LostDispute, cli)
+    when "open" then resolve(Braintree::Dispute::OpenDispute, cli)
+    when "won"  then resolve(Braintree::Dispute::WonDispute, cli)
+    when "lost" then resolve(Braintree::Dispute::LostDispute, cli)
     else
       raise "the status #{cli.options[:status]} is not a valid status"
     end

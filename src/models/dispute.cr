@@ -141,7 +141,7 @@ class Braintree::Models::Dispute
     return self if full_transaction
     return self if shallow_transaction.nil?
 
-    BTQ::TransactionQuery.exec(shallow_transaction.not_nil!.id, source) do |op, tx|
+    BT::Transaction::Find.exec(shallow_transaction.not_nil!.id, source) do |op, tx|
       @full_transaction = tx if tx
     end
 

@@ -1,4 +1,4 @@
-class Braintree::Operations::Dispute::Sandbox::OpenDispute < BTO::Operation
+class Braintree::Dispute::OpenDispute
   private getter amount : String
   private getter card_number : String
   private getter card_expiration : String
@@ -13,7 +13,7 @@ class Braintree::Operations::Dispute::Sandbox::OpenDispute < BTO::Operation
   end
 
   def exec
-    CreateTransaction.new(@amount, @card_number, @card_expiration).exec do |op, tx|
+    Transaction::Create.new(@amount, @card_number, @card_expiration).exec do |op, tx|
       disputes = tx.try(&.disputes)
       dispute_count = disputes.try(&.size)
       if 0 < (dispute_count || 0)

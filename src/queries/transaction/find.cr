@@ -1,8 +1,12 @@
-class Braintree::Queries::TransactionQuery < BTQ::Query
-  private getter id : String
-  private getter source : String # Extract into constant or enum
+class Braintree::Transaction::Find < Braintree::Query
+  getter response : HTTP::Client::Response?
+  getter id : String
 
   def initialize(@id, @source = "local")
+    @resource = HTTP::Request.new(
+      method: "GET",
+      resource: "/merchants/#{BT.config.merchant}/transactions/#{id}"
+    )
   end
 
   def exec
@@ -15,7 +19,9 @@ class Braintree::Queries::TransactionQuery < BTQ::Query
       end
     end
 
-    response = Braintree.http.get("/merchants/#{BT.config.merchant}/transactions/#{id}")
+    response = Braintree.http.exec(@resource)
+    @response = response
+
     Log.debug { "Transaction(#{id}) #{response.success? ? "Succesfully" : "Failed"} to fetch from remote" }
 
     if xml_node = XML.parse(response.body).xpath_node("./transaction")
